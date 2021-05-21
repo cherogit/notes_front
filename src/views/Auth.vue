@@ -1,24 +1,42 @@
 <template>
   <div class="auth">
     <h1>AuthPage</h1>
-    <form action="http://localhost:8000/auth" method="POST">
+    <form action="">
       <label class="label">
-        <input class="input" type="text" name="login">
+        <input class="input" v-model="user.login" type="text" name="login">
         <div class="label__name">login</div>
       </label>
       <label class="label">
-        <input class="input" type="password" name="password">
+        <input class="input" v-model="user.password" type="password" name="password">
         <div class="label__name">password</div>
       </label>
-      <button>join</button>
+      <button type="button" @click="authRequest()">join</button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from 'vue'
+import axios from 'axios'
 
 export default defineComponent({
-  name: 'Auth',
+    name: 'Auth',
+    data() {
+        return {
+            user: {
+                login: null,
+                password: null
+            }
+        }
+    },
+    mounted(): void {
+        this.authRequest()
+    },
+    methods: {
+        authRequest() {
+            console.log('submit', this.user)
+            axios.post('http://localhost:8000/auth', this.user)
+        }
+    }
 });
 </script>
