@@ -6,7 +6,7 @@
         <router-link class="nav__link" to="/self">Self</router-link>
       </nav>
       <div class="header__user">
-        <template v-if="hasUserInfo">
+        <template v-if="user">
           <span class="header__user-info">{{ user.userName }}</span>
           <router-link class="btn btn--colored" to="/logout">logout</router-link>
         </template>
@@ -16,7 +16,7 @@
   </header>
 
   <div class="container">
-    <div v-if="hasUserInfo || isGeneralPages">
+    <div v-if="!!user || isGeneralPages">
       <router-view/>
     </div>
     <div v-else>
@@ -33,12 +33,13 @@
 <script lang="ts">
 import {defineComponent} from 'vue'
 import {getUser} from '@/plugins/api'
+import {User} from '@/typings'
 
 export default defineComponent({
   name: 'App',
   data() {
     return {
-      user: {},
+      user: null as User | null,
       error: {
         status: null,
         message: ''
@@ -63,9 +64,6 @@ export default defineComponent({
     isGeneralPages(): boolean {
       return ['/auth', '/registration'].includes(this.$route.path)
     },
-    hasUserInfo(): boolean {
-      return Object.keys(this.user).length > 0
-    }
   }
 });
 </script>
