@@ -19,20 +19,18 @@
     <div v-if="!!user || isGeneralPages">
       <router-view/>
     </div>
-    <div v-else>
-      <h2>{{ error.message }}</h2>
-      <h3>error code: {{ error.status }}</h3>
-
+    <div v-else-if="!!$store.state.errors.getUserInfo">
+      <h2>{{ $store.state.errors.getUserInfo.message }}</h2>
       <br>
 
       <router-link class="btn btn--colored" to="/auth">authorization</router-link>
     </div>
+    <h2 v-else>все пошло не по плану...</h2>
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from 'vue'
-import {getUser} from '@/plugins/api'
 import {User} from '@/typings'
 
 export default defineComponent({
@@ -40,25 +38,18 @@ export default defineComponent({
   data() {
     return {
       user: null as User | null,
-      error: {
-        status: null,
-        message: ''
-      }
     }
   },
   mounted() {
-    const getUserInfo = async () => {
-      try {
-        this.user = await getUser()
-      } catch (err) {
-        this.error.status = err.response.status
-        this.error.message = err.response.data
+    console.log('app', this.$store.state)
 
-        console.error(err.response)
-      }
+    if (!this.$store.state) {
+      this.$store.commit('setError', {action: 'getUserInfo', error: null})
+      this.$store.dispatch('getUserInfo')
+      this.user = this.$store.state
+    } else {
+      // this.user = this.$store.state
     }
-
-    getUserInfo()
   },
   computed: {
     isGeneralPages(): boolean {
