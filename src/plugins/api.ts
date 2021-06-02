@@ -11,8 +11,14 @@ export const getUser = async (): Promise<User> => {
     return (await api.get('/self')).data
 }
 
-export const doLogin = async (loginForm: { login: string, password: string }): Promise<User> => {
+export const doLogin = async (loginForm: { login: string, password: string }): Promise<void> => {
     await api.post('/auth', loginForm)
+}
 
-    return await getUser()
+export const registration = async (registrationForm: { login: string, userName: string, password: string }): Promise<void> => {
+    await api.post('/registration', registrationForm)
+}
+
+export const doLogout = async (): Promise<void> => {
+    await api.get('/logout')
 }

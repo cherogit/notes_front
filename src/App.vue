@@ -3,12 +3,13 @@
     <div class="header__wrapper container">
       <nav class="header__nav nav">
         <router-link class="nav__link" to="/">Home</router-link>
-        <router-link class="nav__link" to="/self">Self</router-link>
+        <router-link class="nav__link" to="/auth">Auth</router-link>
+        <router-link class="nav__link" to="/registration">Registration</router-link>
       </nav>
       <div class="header__user">
         <template v-if="user">
           <span class="header__user-info">{{ user.userName }}</span>
-          <router-link class="btn btn--colored" to="/logout">logout</router-link>
+          <button class="btn btn--colored" type="button" @click="logout">logout</button>
         </template>
         <router-link v-else class="btn btn--colored" to="/auth">authorization</router-link>
       </div>
@@ -31,30 +32,32 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue'
-import {User} from '@/typings'
+import {mapActions, mapState, mapMutations} from 'vuex'
 
 export default defineComponent({
   name: 'App',
-  data() {
-    return {
-      user: null as User | null,
-    }
-  },
   mounted() {
-    console.log('app', this.$store.state)
-
-    if (!this.$store.state) {
-      this.$store.commit('setError', {action: 'getUserInfo', error: null})
-      this.$store.dispatch('getUserInfo')
-      this.user = this.$store.state
-    } else {
-      // this.user = this.$store.state
+    if (!this.user) {
+      this.setError({action: 'getUserInfo', error: null})
+      this.getUserInfo()
     }
   },
   computed: {
+    ...mapState([
+      'user'
+    ]),
     isGeneralPages(): boolean {
       return ['/auth', '/registration'].includes(this.$route.path)
     },
+  },
+  methods: {
+    ...mapActions(['getUserInfo', 'logoutRequest']),
+    ...mapMutations(['setError']),
+
+    logout() {
+      this.logoutRequest()
+      this.$router.push({path: '/'})
+    }
   }
 });
 </script>

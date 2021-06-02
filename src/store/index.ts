@@ -1,13 +1,14 @@
 import {createStore} from 'vuex'
 import {User} from '@/typings'
 import {InjectionKey} from 'vue'
-import {doLogin, getUser} from '@/plugins/api'
+import {doLogin, getUser, registration, doLogout} from '@/plugins/api'
 
 const initialState = {
     user: null as User | null,
     errors: {
         getUserInfo: null as Error | null,
         authRequest: null as Error | null,
+        registrationRequest: null as Error | null,
     }
 }
 type State = typeof initialState
@@ -42,17 +43,33 @@ export const store = createStore<State>({
                 console.error(err)
             }
         },
-        async authRequest({commit}, loginForm) {
+        async authRequest({commit, dispatch}, loginForm) {
             commit('setError', {action: 'authRequest', error: null})
-            commit('setError', {action: 'getUserInfo', error: null})
 
             try {
-                const user = await doLogin(loginForm)
-                commit('setUser', user)
+                await doLogin(loginForm)
+                dispatch('getUserInfo')
             } catch (err) {
                 commit('setError', {action: 'authRequest', error: err})
                 console.error(err)
             }
+        },
+        async registrationRequest({commit, dispatch}, registrationForm) {
+            commit('setError', {action: 'registrationRequest', error: null})
+
+            try {
+                await registration(registrationForm)
+                dispatch('authRequest', {login: registrationForm.login, password: registrationForm.password})
+            } catch (err) {
+                commit('setError', {action: 'registrationRequest', error: err})
+                console.error(err)
+            }
+        },
+        async logoutRequest({commit, dispatch}) {
+            await doLogout()
+            dispatch('getUserInfo')
+            commit('setUser', null)
+
         }
     },
     modules: {}
