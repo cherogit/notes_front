@@ -22,13 +22,11 @@ type State = typeof initialState
 export const store = createStore<State>({
     state: initialState,
     mutations: {
-        setError(state, value: {action: keyof State['errors'], error: Error | null}) {
+        setError(state, value: { action: keyof State['errors'], error: Error | null }) {
             state.errors[value.action] = value.error
         },
         setUser(state, value) {
-            console.log('setUser', state, value)
             state.user = value
-            console.log('setUser update', state, value)
         }
     },
     actions: {
@@ -47,8 +45,8 @@ export const store = createStore<State>({
             commit('setError', {action: 'authRequest', error: null})
 
             try {
-                await doLogin(loginForm)
-                dispatch('getUserInfo')
+                const user = await doLogin(loginForm)
+                commit('setUser', user)
             } catch (err) {
                 commit('setError', {action: 'authRequest', error: err})
                 console.error(err)
@@ -58,8 +56,8 @@ export const store = createStore<State>({
             commit('setError', {action: 'registrationRequest', error: null})
 
             try {
-                await registration(registrationForm)
-                dispatch('authRequest', {login: registrationForm.login, password: registrationForm.password})
+                const user = await registration(registrationForm)
+                commit('setUser', user)
             } catch (err) {
                 commit('setError', {action: 'registrationRequest', error: err})
                 console.error(err)

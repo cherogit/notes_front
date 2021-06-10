@@ -34,9 +34,12 @@ export default defineComponent({
   },
   methods: {
     ...mapActions(['registrationRequest']),
+
     registration() {
       this.registrationRequest({login: this.login, userName: this.userName, password: this.password})
-      this.$router.push({ path: '/' })
+      console.log('errors', this.$store.state.errors)
+
+      // this.$router.push({ path: '/' })
     }
   }
 });

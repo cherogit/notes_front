@@ -32,13 +32,12 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue'
-import {mapActions, mapState, mapMutations} from 'vuex'
+import {mapActions, mapState} from 'vuex'
 
 export default defineComponent({
   name: 'App',
   mounted() {
     if (!this.user) {
-      this.setError({action: 'getUserInfo', error: null})
       this.getUserInfo()
     }
   },
@@ -52,7 +51,6 @@ export default defineComponent({
   },
   methods: {
     ...mapActions(['getUserInfo', 'logoutRequest']),
-    ...mapMutations(['setError']),
 
     logout() {
       this.logoutRequest()
