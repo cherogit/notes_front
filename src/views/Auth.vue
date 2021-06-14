@@ -3,21 +3,26 @@
     <h1>AuthPage</h1>
     <form action="">
       <label class="label">
-        <input class="input" v-model="login" type="text" name="login">
         <div class="label__name">login</div>
+        <input class="input" v-model="login" type="text" name="login">
+        <span v-if="formErrors.login">login {{ formErrors.login }}</span>
       </label>
       <label class="label">
-        <input class="input" v-model="password" type="password" name="password">
         <div class="label__name">password</div>
+        <input class="input" v-model="password" type="password" name="password">
+        <span v-if="formErrors.password">password {{ formErrors.password }}</span>
       </label>
       <button type="button" @click="authorization">join</button>
     </form>
+    <p v-if="errors.authRequest">
+      {{ errors.authRequest }}
+    </p>
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent} from 'vue'
-import {mapActions} from 'vuex'
+import {mapActions, mapState} from 'vuex'
 
 export default defineComponent({
   name: 'Auth',
@@ -27,12 +32,67 @@ export default defineComponent({
       password: ''
     }
   },
+  computed: {
+    ...mapState([
+      'errors'
+    ]),
+    formErrors() {
+      const errors = {
+        login: null,
+        password: null,
+        // message: this.errors.authRequest?.message || null,
+      }
+
+      const errorsArr = this.errors.authRequest?.errors
+
+      if (Array.isArray(errorsArr)) {
+        const loginError = errorsArr.find(err => err.instancePath.startsWith('/login'))
+
+        if (loginError) {
+          errors.login = loginError.message
+        }
+
+        const passwordError = errorsArr.find(err => err.instancePath.startsWith('/password'))
+
+        if (passwordError) {
+          errors.password = passwordError.message
+        }
+      }
+
+      return errors
+    }
+  },
   methods: {
     ...mapActions(['authRequest']),
     authorization() {
-      this.authRequest({login: this.login, password: this.password})
-      this.$router.push({ path: '/' })
+      this.authRequest({login: this.login, password: this.password}).then(() => {
+        this.$nextTick(() => {
+          if (!this.errors.authRequest) {
+            this.$router.push({path: '/'})
+          }
+        })
+      })
     }
   }
 })
 </script>
+
+<style lang="less">
+label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+
+  div {
+    flex-basis: 80px;
+    margin-right: 8px;
+  }
+
+  span {
+    display: block;
+    margin-left: 8px;
+    color: maroon;
+    font-size: 12px;
+  }
+}
+</style>

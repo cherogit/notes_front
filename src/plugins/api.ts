@@ -1,6 +1,8 @@
 import axios from 'axios'
 import {User} from '@/typings'
 
+export const isAxiosError = axios.isAxiosError
+
 export const api = axios.create({
     baseURL: 'http://localhost:8000',
     timeout: 1000,

@@ -3,12 +3,14 @@ import {User} from '@/typings'
 import {InjectionKey} from 'vue'
 import {doLogin, getUser, registration, doLogout} from '@/plugins/api'
 
+type ActionError = Error | null | { [K: string]: any }
+
 const initialState = {
     user: null as User | null,
     errors: {
-        getUserInfo: null as Error | null,
-        authRequest: null as Error | null,
-        registrationRequest: null as Error | null,
+        getUserInfo: null as ActionError,
+        authRequest: null as ActionError,
+        registrationRequest: null as ActionError,
     }
 }
 type State = typeof initialState
@@ -23,7 +25,11 @@ export const store = createStore<State>({
     state: initialState,
     mutations: {
         setError(state, value: { action: keyof State['errors'], error: Error | null }) {
-            state.errors[value.action] = value.error
+            if ((value.error as any)?.response) {
+                state.errors[value.action] = (value.error as any).response.data || null
+            } else {
+                state.errors[value.action] = value.error
+            }
         },
         setUser(state, value) {
             state.user = value

@@ -21,12 +21,12 @@
       <router-view/>
     </div>
     <div v-else-if="!!$store.state.errors.getUserInfo">
-      <h2>{{ $store.state.errors.getUserInfo.message }}</h2>
+      <h2>{{ $store.state.errors.getUserInfo.status }} <br> {{ $store.state.errors.getUserInfo.data }}</h2>
       <br>
 
       <router-link class="btn btn--colored" to="/auth">authorization</router-link>
     </div>
-    <h2 v-else>все пошло не по плану...</h2>
+    <h2 v-else>все пошло не по плану.</h2>
   </div>
 </template>
 
