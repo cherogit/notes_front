@@ -12,7 +12,7 @@
         <input class="input" v-model="password" type="password" name="password">
         <span v-if="formErrors.password">password {{ formErrors.password }}</span>
       </label>
-      <button type="button" @click="authorization">join</button>
+      <button class="btn btn--colored" type="button" @click="authorization">join</button>
     </form>
     <p v-if="errors.authRequest">
       {{ errors.authRequest }}
@@ -78,14 +78,20 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+form {
+  margin-top: 40px;
+}
+
 label {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   margin-bottom: 16px;
 
   div {
-    flex-basis: 80px;
-    margin-right: 8px;
+    width: 100%;
+    margin-bottom: 4px;
+    font-size: 14px;
   }
 
   span {

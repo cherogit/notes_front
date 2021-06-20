@@ -21,7 +21,7 @@
       <router-view/>
     </div>
     <div v-else-if="!!$store.state.errors.getUserInfo">
-      <h2>{{ $store.state.errors.getUserInfo.status }} <br> {{ $store.state.errors.getUserInfo.data }}</h2>
+      <h2>{{ $store.state.errors.getUserInfo }} <br> {{ $store.state.errors.getUserInfo }}</h2>
       <br>
 
       <router-link class="btn btn--colored" to="/auth">authorization</router-link>
@@ -40,10 +40,13 @@ export default defineComponent({
     if (!this.user) {
       this.getUserInfo()
     }
+
+    console.log(this.errors)
   },
   computed: {
     ...mapState([
-      'user'
+      'user',
+      'errors'
     ]),
     isGeneralPages(): boolean {
       return ['/auth', '/registration'].includes(this.$route.path)
@@ -76,7 +79,6 @@ export default defineComponent({
 }
 
 .nav__link {
-  color: white;
   text-decoration: none;
 
   &:hover {
@@ -97,5 +99,9 @@ export default defineComponent({
     background-color: tomato;
     color: white;
   }
+}
+
+.header__user-info {
+  margin-right: 8px;
 }
 </style>

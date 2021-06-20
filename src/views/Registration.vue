@@ -18,7 +18,7 @@
         <input class="input" v-model="password" type="password" name="password">
         <span v-if="formErrors.password">password {{ formErrors.password }}</span>
       </label>
-      <button type="button" @click="registration">join</button>
+      <button class="btn btn--colored" type="button" @click="registration">join</button>
     </form>
   </div>
 </template>

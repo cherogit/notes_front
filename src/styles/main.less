@@ -1,3 +1,12 @@
+@font-face {
+  font-family: 'SF UI Text';
+  src: url('../assets/fonts/SFUIText-Light.woff2') format('woff2'),
+  url('../assets/fonts/SFUIText-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,7 +14,8 @@
 }
 
 body {
-  background-color: lightslategray;
+  font-family: 'SF UI Text';
+  color: #282828;
 }
 
 .container {
@@ -17,4 +27,9 @@ button {
   border: 0;
   outline: 0;
   cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
