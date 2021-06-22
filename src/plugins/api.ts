@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {User} from '@/typings'
+import {User, Note} from '@/typings'
 
 export const isAxiosError = axios.isAxiosError
 
@@ -23,4 +23,8 @@ export const registration = async (registrationForm: { login: string, userName: 
 
 export const doLogout = async (): Promise<void> => {
     await api.get('/logout')
+}
+
+export const getNotes = async (): Promise<{notes: Note[]}> => {
+    return (await api.get('/notes')).data
 }

@@ -1,16 +1,18 @@
 import {createStore} from 'vuex'
-import {User} from '@/typings'
+import {Note, User} from '@/typings'
 import {InjectionKey} from 'vue'
-import {doLogin, getUser, registration, doLogout} from '@/plugins/api'
+import {doLogin, getUser, registration, doLogout, getNotes} from '@/plugins/api'
 
 type ActionError = Error | null | { [K: string]: any }
 
 const initialState = {
     user: null as User | null,
+    notes: [] as Note[],
     errors: {
         getUserInfo: null as ActionError,
         authRequest: null as ActionError,
         registrationRequest: null as ActionError,
+        getNotes: null as ActionError,
     }
 }
 type State = typeof initialState
@@ -31,8 +33,11 @@ export const store = createStore<State>({
                 state.errors[value.action] = value.error
             }
         },
-        setUser(state, value) {
-            state.user = value
+        setUser(state, user: User) {
+            state.user = user
+        },
+        setNotes(state, notes: Note[]) {
+            state.notes = notes
         }
     },
     actions: {
@@ -73,8 +78,18 @@ export const store = createStore<State>({
             await doLogout()
             dispatch('getUserInfo')
             commit('setUser', null)
+        },
+        async getNotes({commit}) {
+            commit('setError', {action: 'getNotes', error: null})
 
-        }
+            try {
+                const result = await getNotes()
+                commit('setNotes', result.notes)
+            } catch (err) {
+                commit('setError', {action: 'getNotes', error: err})
+                console.error(err)
+            }
+        },
     },
     modules: {}
 })
