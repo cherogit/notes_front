@@ -11,6 +11,8 @@ export interface Note {
     publication_date: string
 }
 
-export type CreatableNote = Omit<Note, '_id' | 'publication_date'>
-export type CreatableNote2 = Partial<Note> // пример
-export type CreatableNote3 = CreatableNote & {_id?: string} // пример2
+export type CreatableNote = Omit<Note, '_id'>
+
+export type CreatableNote2 = Omit<Note, '_id' | 'publication_date'>
+export type CreatableNote3 = Partial<Note> // пример
+export type CreatableNote4 = CreatableNote & {_id?: string} // пример2

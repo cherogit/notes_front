@@ -83,10 +83,11 @@ form {
 }
 
 label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 16px;
+  font-size: 12px;
 
   div {
     width: 100%;

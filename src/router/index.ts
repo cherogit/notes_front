@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import Auth from '../views/Auth.vue'
 import Registration from '../views/Registration.vue'
 import Notes from '../views/Notes.vue'
+import CreateNote from '../views/CreateNote.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -24,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/notes',
     name: 'Notes',
     component: Notes
+  },
+  {
+    path: '/create-note',
+    name: 'CreateNote',
+    component: CreateNote
   }
 ]
 
