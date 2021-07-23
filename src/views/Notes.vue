@@ -3,6 +3,7 @@
     <h1>notes list</h1>
     <div class="notes__links">
       <router-link to="/create-note" class="btn btn--colored">add note</router-link>
+      <button class="btn btn--colored" type="button" @click="generateNote">generate note</button>
     </div>
 
     <div
@@ -129,7 +130,29 @@ export default defineComponent({
     }
   },
   methods: {
-    ...mapActions(['getNotes', 'deleteNote']),
+    ...mapActions(['getNotes', 'createNoteRequest', 'deleteNote']),
+    generateNote() {
+      const randomTitleAndNoteStr: string = Math.random().toString().slice(2)
+      const labels = ['Новости', 'Рубрика', 'Новинка', 'Флуд']
+      const randomLabels = labels[Math.floor(Math.random() * labels.length)]
+      const date = new Date()
+      const publicationDate = date.toISOString().slice(0, 10)
+
+      const formData = new FormData()
+
+      formData.append('title', `${randomTitleAndNoteStr}_title`)
+      formData.append('note', `${randomTitleAndNoteStr}_note`)
+      formData.append('labels[]', randomLabels)
+      formData.append('publication_date', publicationDate)
+
+      this.createNoteRequest(formData).then(() => {
+        this.$nextTick(() => {
+          if (!this.errors.createNote) {
+            this.$router.push({path: '/notes'})
+          }
+        })
+      })
+    },
     resetDeletion() {
       this.isShowingPopup = false
       this.removableNoteId = null

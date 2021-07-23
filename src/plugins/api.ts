@@ -32,7 +32,7 @@ export const createNote = async (noteCreationFormData: { title: string, note: st
 }
 
 export const deleteNote = async (nodeId: string): Promise<void> => {
-    if (Math.random() >= 0.3) {
+    if (Math.random() >= 0.1) {
         const error = new Error('SOME_ERROR')
         throw error
     }
