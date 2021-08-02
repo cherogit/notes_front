@@ -27,12 +27,22 @@ export const getNotes = async (): Promise<{ notes: Note[] }> => {
     return (await api.get('/notes')).data
 }
 
+export const loadNoteById = async (noteId: string): Promise<Note> => {
+    return (await api.get(`/note/${noteId}`)).data
+}
+
 export const createNote = async (noteCreationFormData: { title: string, note: string, labels: string, publication_date: string }): Promise<CreatableNote> => {
     return (await api.post('/create-note', noteCreationFormData)).data
 }
 
+export const updateNote = async (noteId: string, noteUpdatingFormData: { title: string, note: string, labels: string, publication_date: string }): Promise<Note> => {
+    console.log(noteUpdatingFormData)
+
+    return (await api.put(`/update/${noteId}`, noteUpdatingFormData)).data
+}
+
 export const deleteNote = async (nodeId: string): Promise<void> => {
-    if (Math.random() >= 0.1) {
+    if (Math.random() >= 0.9) {
         const error = new Error('SOME_ERROR')
         throw error
     }

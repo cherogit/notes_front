@@ -84,12 +84,12 @@
             >
               delete
             </button>
-            <a
-              href="#"
+            <router-link
+              :to="{path: `/update/${note._id}/`}"
               class="btn notes__item-controls-btn _update"
             >
               update
-            </a>
+            </router-link>
           </div>
         </div>
       </li>
@@ -137,7 +137,6 @@ export default defineComponent({
       const randomLabels = labels[Math.floor(Math.random() * labels.length)]
       const date = new Date()
       const publicationDate = date.toISOString().slice(0, 10)
-
       const formData = new FormData()
 
       formData.append('title', `${randomTitleAndNoteStr}_title`)
