@@ -1,4 +1,4 @@
-import {createStore} from 'vuex'
+import {Action, createStore} from 'vuex'
 import {Note, User} from '@/typings'
 import {InjectionKey} from 'vue'
 import * as api from '@/plugins/api'
@@ -13,7 +13,9 @@ const initialState = {
         authRequest: null as ActionError,
         registrationRequest: null as ActionError,
         getNotes: null as ActionError,
+        loadNoteById: null as ActionError,
         createNote: null as ActionError,
+        updateNote: null as ActionError,
         deleteNote: null as ActionError
     }
 }
@@ -27,7 +29,11 @@ type State = typeof initialState
 
 export const store = createStore<State>({
     state: initialState,
-
+    getters: {
+        noteById: (state) => (_id: string): Note | null => {
+            return state.notes.find(note => note._id === _id) || null
+        }
+    },
     mutations: {
         setError(state, value: { action: keyof State['errors'], error: Error | null }) {
             if ((value.error as any)?.response) {
@@ -52,7 +58,7 @@ export const store = createStore<State>({
         },
         removeNote(state, noteId: Note['_id']) {
             const existingNoteIndex = state.notes.findIndex(item => item._id === noteId)
-            if (existingNoteIndex) {
+            if (existingNoteIndex != -1) {
                 state.notes.splice(existingNoteIndex, 1)
             }
         }
@@ -107,6 +113,17 @@ export const store = createStore<State>({
                 console.error(err)
             }
         },
+        async loadNoteById({commit}, noteId: string) {
+            commit('setError', {action: 'loadNoteById', error: null})
+
+            try {
+                const note = await api.loadNoteById(noteId)
+                commit('appendNote', note)
+            } catch (err) {
+                commit('setError', {action: 'loadNoteById', error: err})
+                console.error(err)
+            }
+        },
         async createNoteRequest({commit}, noteCreationFormData) {
             commit('setError', {action: 'createNote', error: null})
 
@@ -114,7 +131,18 @@ export const store = createStore<State>({
                 const note = await api.createNote(noteCreationFormData)
                 commit('appendNote', note)
             } catch (err) {
-                commit('setError', {action: 'createNote'})
+                commit('setError', {action: 'createNote', error: err})
+                console.error(err)
+            }
+        },
+        async updateNote({commit}, [noteId, noteUpdatingFormData]) {
+            commit('setError', {action: 'updateNote', error: null})
+
+            try {
+                await api.updateNote(noteId, noteUpdatingFormData)
+            } catch (err) {
+                commit('setError', {action: 'updateNote', error: err})
+                console.error(err)
             }
         },
         async deleteNote({commit, dispatch}, noteId) {
