@@ -5,12 +5,12 @@
       <label class="label">
         <div class="label__name">login</div>
         <input class="input" v-model="login" type="text" name="login">
-        <span v-if="formErrors.login">login {{ formErrors.login }}</span>
+        <span v-if="formErrors.login">Поле login {{ formErrors.login }}</span>
       </label>
       <label class="label">
         <div class="label__name">password</div>
         <input class="input" v-model="password" type="password" name="password">
-        <span v-if="formErrors.password">password {{ formErrors.password }}</span>
+        <span v-if="formErrors.password">Поле password {{ formErrors.password }}</span>
       </label>
       <button class="btn btn--colored" type="button" @click="authorization">join</button>
     </form>
@@ -83,10 +83,11 @@ form {
 }
 
 label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 16px;
+  font-size: 12px;
 
   div {
     width: 100%;

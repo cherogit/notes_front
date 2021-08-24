@@ -3,8 +3,13 @@
     <div class="header__wrapper container">
       <nav class="header__nav nav">
         <router-link class="nav__link" to="/">Home</router-link>
-        <router-link class="nav__link" to="/auth">Auth</router-link>
-        <router-link class="nav__link" to="/registration">Registration</router-link>
+        <template v-if="!user">
+          <router-link class="nav__link" to="/auth">Auth</router-link>
+          <router-link class="nav__link" to="/registration">Registration</router-link>
+        </template>
+        <template v-if="user">
+          <router-link class="nav__link" to="/notes">Notes</router-link>
+        </template>
       </nav>
       <div class="header__user">
         <template v-if="user">
@@ -20,13 +25,12 @@
     <div v-if="!!user || isGeneralPages">
       <router-view/>
     </div>
-    <div v-else-if="!!$store.state.errors.getUserInfo">
-      <h2>{{ $store.state.errors.getUserInfo }} <br> {{ $store.state.errors.getUserInfo }}</h2>
+    <div v-else-if="!!errors.getUserInfo">
+      <h2>{{ errors.getUserInfo.error.status }}: {{ errors.getUserInfo.error.message }}</h2>
       <br>
 
       <router-link class="btn btn--colored" to="/auth">authorization</router-link>
     </div>
-    <h2 v-else>все пошло не по плану.</h2>
   </div>
 </template>
 
