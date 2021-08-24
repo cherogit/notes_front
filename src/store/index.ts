@@ -1,4 +1,4 @@
-import {Action, createStore} from 'vuex'
+import {Action, ActionContext, createStore, Store as VuexStore} from 'vuex'
 import {Note, User} from '@/typings'
 import {InjectionKey} from 'vue'
 import * as api from '@/plugins/api'
@@ -8,16 +8,7 @@ type ActionError = Error | null | { [K: string]: any }
 const initialState = {
     user: null as User | null,
     notes: [] as Note[],
-    errors: {
-        getUserInfo: null as ActionError,
-        authRequest: null as ActionError,
-        registrationRequest: null as ActionError,
-        getNotes: null as ActionError,
-        loadNoteById: null as ActionError,
-        createNote: null as ActionError,
-        updateNote: null as ActionError,
-        deleteNote: null as ActionError
-    }
+    errors: {} as Record<string, ActionError>
 }
 type State = typeof initialState
 //
@@ -26,6 +17,24 @@ type State = typeof initialState
 // }
 //
 // setError(initialState, {key: 'getUser2', error: null})
+
+type MyActionHandler<S, R, P> = (this: VuexStore<R>, injectee: ActionContext<S, R>, payload: P) => any
+
+const actionFactory = <P, R>(actionName: string, mutationName: string, payloadGetter: (p: P) => Promise<R>): MyActionHandler<State, State, P> => {
+    const fn: MyActionHandler<State, State, P> = async ({commit}, params) => {
+        commit('setError', {action: actionName, error: null})
+
+        try {
+            const result = await payloadGetter(params)
+            commit(mutationName, result)
+        } catch (err) {
+            commit('setError', {action: actionName, error: err})
+            console.error(err)
+        }
+    }
+
+    return fn
+}
 
 export const store = createStore<State>({
     state: initialState,
@@ -64,98 +73,36 @@ export const store = createStore<State>({
         }
     },
     actions: {
-        async getUserInfo({commit}) {
-            commit('setError', {action: 'getUserInfo', error: null})
-
-            try {
-                const user = await api.getUser()
-                commit('setUser', user)
-            } catch (err) {
-                commit('setError', {action: 'getUserInfo', error: err})
-                console.error(err)
-            }
-        },
-        async authRequest({commit}, loginForm) {
-            commit('setError', {action: 'authRequest', error: null})
-
-            try {
-                const user = await api.doLogin(loginForm)
-                commit('setUser', user)
-            } catch (err) {
-                commit('setError', {action: 'authRequest', error: err})
-                console.error(err)
-            }
-        },
-        async registrationRequest({commit}, registrationForm) {
-            commit('setError', {action: 'registrationRequest', error: null})
-
-            try {
-                const user = await api.registration(registrationForm)
-                commit('setUser', user)
-            } catch (err) {
-                commit('setError', {action: 'registrationRequest', error: err})
-                console.error(err)
-            }
-        },
+        getUserInfo: actionFactory('getUserInfo', 'setUser', async () => {
+            return await api.getUser()
+        }),
+        authRequest: actionFactory('authRequest', 'setUser', async loginForm => {
+            return await api.doLogin(loginForm)
+        }),
+        registrationRequest: actionFactory('registrationRequest', 'setUser', async registrationForm => {
+            return await api.registration(registrationForm)
+        }),
         async logoutRequest({commit, dispatch}) {
             await api.doLogout()
             dispatch('getUserInfo')
             commit('setUser', null)
         },
-        async getNotes({commit}) {
-            commit('setError', {action: 'getNotes', error: null})
-
-            try {
-                const result = await api.getNotes()
-                commit('setNotes', result.notes)
-            } catch (err) {
-                commit('setError', {action: 'getNotes', error: err})
-                console.error(err)
-            }
-        },
-        async loadNoteById({commit}, noteId: string) {
-            commit('setError', {action: 'loadNoteById', error: null})
-
-            try {
-                const note = await api.loadNoteById(noteId)
-                commit('appendNote', note)
-            } catch (err) {
-                commit('setError', {action: 'loadNoteById', error: err})
-                console.error(err)
-            }
-        },
-        async createNoteRequest({commit}, noteCreationFormData) {
-            commit('setError', {action: 'createNote', error: null})
-
-            try {
-                const note = await api.createNote(noteCreationFormData)
-                commit('appendNote', note)
-            } catch (err) {
-                commit('setError', {action: 'createNote', error: err})
-                console.error(err)
-            }
-        },
-        async updateNote({commit}, [noteId, noteUpdatingFormData]) {
-            commit('setError', {action: 'updateNote', error: null})
-
-            try {
-                await api.updateNote(noteId, noteUpdatingFormData)
-            } catch (err) {
-                commit('setError', {action: 'updateNote', error: err})
-                console.error(err)
-            }
-        },
-        async deleteNote({commit, dispatch}, noteId) {
-            commit('setError', {action: 'deleteNote', error: null})
-
-            try {
-                await api.deleteNote(noteId)
-                commit('removeNote', noteId)
-            } catch (err) {
-                commit('setError', {action: 'deleteNote', error: err})
-                console.error(err)
-            }
-        },
+        getNotes: actionFactory('getNotes', 'setNotes', async () => {
+            const result = await api.getNotes()
+            return result.notes
+        }),
+        loadNoteById: actionFactory('loadNoteById', 'appendNote', async (noteId: string) => {
+            return await api.loadNoteById(noteId)
+        }),
+        createNoteRequest: actionFactory('createNote', 'appendNote', async (noteCreationFormData) => {
+            return await api.createNote(noteCreationFormData)
+        }),
+        updateNote: actionFactory('updateNote', '',async ([noteId, noteUpdatingFormData]) => {
+            return await api.updateNote(noteId, noteUpdatingFormData)
+        }),
+        deleteNote: actionFactory('deleteNote', 'removeNote', async (noteId: string) => {
+            return await api.deleteNote(noteId)
+        })
     }
 })
 
