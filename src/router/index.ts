@@ -5,6 +5,7 @@ import Registration from '../views/Registration.vue'
 import Notes from '../views/Notes.vue'
 import CreateNote from '../views/CreateNote.vue'
 import UpdateNote from '@/views/UpdateNote.vue'
+import NotFound from '@/views/NotFound.vue'
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -36,6 +37,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/update/:id',
         name: 'UpdateNote',
         component: UpdateNote
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFound
     }
 ]
 
