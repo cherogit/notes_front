@@ -9,6 +9,7 @@
         </template>
         <template v-if="user">
           <router-link class="nav__link" to="/notes">Notes</router-link>
+          <router-link class="nav__link" to="/users">Users</router-link>
         </template>
       </nav>
       <div class="header__user">
@@ -71,7 +72,9 @@ export default defineComponent({
 
 .header {
   margin-bottom: 50px;
-  border-bottom: 1px solid white;
+  background: rgba(40, 40, 40, 1);
+  color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 6px 1px #282828;
 }
 
 .header__wrapper {
@@ -84,9 +87,11 @@ export default defineComponent({
 
 .nav__link {
   text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  transition: color 0.1s;
 
   &:hover {
-    color: tomato;
+    color: white;
   }
 
   &:not(:last-child) {

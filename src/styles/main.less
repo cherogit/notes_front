@@ -14,13 +14,15 @@
 }
 
 body {
-  font-family: 'SF UI Text';
+  font-family: 'SF UI Text', sans-serif;
   color: #282828;
+  background-color: rgba(230,233,235,.5);
 }
 
 .container {
   max-width: 1400px;
-  padding: 0 25px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 h1,
@@ -65,11 +67,20 @@ form {
   align-items: flex-start;
 }
 
-input,
+input[type="text"],
+input[type="password"],
 select {
   width: 200px;
   min-height: 38px;
   padding: 0 12px;
   border: 1px solid #282828;
   border-radius: 6px;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin-right: 12px;
+  cursor: pointer;
 }

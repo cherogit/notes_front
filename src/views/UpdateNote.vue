@@ -32,9 +32,10 @@
       </label>
       <label class="label">
         <div class="label__name">publication date</div>
-        <input class="input" v-model="noteData.publicationDate" type="date" name="publication_date">
-        <span v-if="formErrors.publicationDate">Поле publication date {{ formErrors.publicationDate }}</span>
+        <input class="input" v-model="noteData.publication_date" type="date" name="publication_date">
+        <span v-if="formErrors.publication_date">Поле publication date {{ formErrors.publication_date }}</span>
       </label>
+      <input type="hidden" name="id" :value="noteData.id">
       <div class="btns">
         <router-link :to="'/notes/'" class="btn btn--colored">cancel</router-link>
         <button class="btn btn--colored" type="button" @click="updateNoteRequest">save</button>
@@ -46,17 +47,17 @@
 <script lang="ts">
 import {defineComponent} from 'vue'
 import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
-import {Note} from '@/typings';
 
 export default defineComponent({
   name: 'UpdateNote',
   data() {
     return {
       noteData: {
+        _id: null as string | null,
         title: null as string | null,
         note: null as string | null,
         labels: [] as string[],
-        publicationDate: null as string | null,
+        publication_date: null as string | null,
       }
     }
   },
@@ -95,7 +96,7 @@ export default defineComponent({
         title: null,
         note: null,
         labels: null,
-        publicationDate: null
+        publication_date: null
       }
 
       const errorsArr = this.errors.updateNote?.errors
@@ -119,10 +120,10 @@ export default defineComponent({
           errors.labels = labelsError.message
         }
 
-        const publicationDate = errorsArr.find(err => err.instancePath.startsWith('/publication_date'))
+        const publication_date = errorsArr.find(err => err.instancePath.startsWith('/publication_date'))
 
-        if (publicationDate) {
-          errors.publicationDate = publicationDate.message
+        if (publication_date) {
+          errors.publication_date = publication_date.message
         }
       }
 
@@ -141,7 +142,8 @@ export default defineComponent({
       formData.append('title', this.noteData.title || '')
       formData.append('note', this.noteData.note || '')
       formData.append('labels[]', this.noteData.labels.join(',') || '')
-      formData.append('publication_date', this.noteData.publicationDate || '')
+      formData.append('publication_date', this.noteData.publication_date || '')
+      formData.append('id', this.noteData._id || '')
 
       this.updateNote([this.idOfTheUpdatableNote, formData]).then(() => {
         console.log(this.errors.updateNote)
