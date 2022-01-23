@@ -1,5 +1,5 @@
 import {Action, ActionContext, createStore, Store as VuexStore} from 'vuex'
-import {Note, User} from '@/typings'
+import {Note, User, UserForPanel} from '@/typings'
 import {InjectionKey} from 'vue'
 import * as api from '@/plugins/api'
 
@@ -7,6 +7,7 @@ type ActionError = Error | null | { [K: string]: any }
 
 const initialState = {
     user: null as User | null,
+    users: [] as UserForPanel[],
     notes: [] as Note[],
     errors: {} as Record<string, ActionError>
 }
@@ -39,6 +40,13 @@ const actionFactory = <P, R>(actionName: string, mutationName: string, payloadGe
 export const store = createStore<State>({
     state: initialState,
     getters: {
+        checkPermission: (state) => (permission: string): boolean => {
+            if (state.user) {
+                return state.user.permissions.includes(permission)
+            }
+
+            return false
+        },
         noteById: (state) => (_id: string): Note | null => {
             return state.notes.find(note => note._id === _id) || null
         }
@@ -53,6 +61,9 @@ export const store = createStore<State>({
         },
         setUser(state, user: User) {
             state.user = user
+        },
+        setListOfUsers(state, users: UserForPanel[]) {
+            state.users = users
         },
         setNotes(state, notes: Note[]) {
             state.notes = notes
@@ -75,6 +86,11 @@ export const store = createStore<State>({
     actions: {
         getUserInfo: actionFactory('getUserInfo', 'setUser', async () => {
             return await api.getUser()
+        }),
+        getListOfUsers: actionFactory('getListOfUsers', 'setListOfUsers', async () => {
+            console.log('action')
+            const result = await api.getListOfUsers()
+            return result.users
         }),
         authRequest: actionFactory('authRequest', 'setUser', async loginForm => {
             return await api.doLogin(loginForm)
@@ -102,7 +118,10 @@ export const store = createStore<State>({
         }),
         deleteNote: actionFactory('deleteNote', 'removeNote', async (noteId: string) => {
             return await api.deleteNote(noteId)
-        })
+        }),
+        updateRoles: actionFactory('updateRoles', '',async ([userId, roles]) => {
+            return await api.updateRoles(userId, roles)
+        }),
     }
 })
 

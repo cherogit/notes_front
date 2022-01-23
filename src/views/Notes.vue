@@ -69,28 +69,28 @@
         :key="ndx"
         class="notes__item"
       >
-        <div class="notes__item-inner">
-          <div class="notes__item-title">{{ note.title }}</div>
-          <div class="notes__item-body">
-            <div>{{ note.note }}</div>
-            <div>{{ note.labels[0] }}</div>
-            <div>{{ note.publication_date }}</div>
-          </div>
-          <div class="notes__item-controls">
-            <button
-              class="btn notes__item-controls-btn _delete"
-              type="button"
-              @click="openNoteConfirmation(note._id)"
-            >
-              delete
-            </button>
-            <router-link
-              :to="{path: `/update/${note._id}/`}"
-              class="btn notes__item-controls-btn _update"
-            >
-              update
-            </router-link>
-          </div>
+        <div class="notes__item-title">{{ note.title }}</div>
+        <div class="notes__item-controls">
+          <router-link
+            :to="{path: `/note/${note._id}/`}"
+            class="btn notes__item-controls-btn _more"
+          >
+            more
+          </router-link>
+          <button
+            class="btn notes__item-controls-btn _delete"
+            type="button"
+            @click="openNoteConfirmation(note._id)"
+          >
+            delete
+          </button>
+          <router-link
+            v-if="checkPermission(PERMISSIONS.updateNote)"
+            :to="{path: `/update/${note._id}/`}"
+            class="btn notes__item-controls-btn _update"
+          >
+            update
+          </router-link>
         </div>
       </li>
     </ul>
@@ -99,8 +99,8 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue'
-import {mapActions, mapState} from 'vuex'
-import {DeletionStates} from '@/constants'
+import {mapActions, mapGetters, mapState} from 'vuex'
+import {DeletionStates, PERMISSIONS} from '@/constants'
 import {Note} from '@/typings'
 
 export default defineComponent({
@@ -111,16 +111,23 @@ export default defineComponent({
       deletionState: DeletionStates.IDLE,
       removableNoteId: null as string | null,
 
-      DeletionStates
+      DeletionStates,
+      PERMISSIONS
     }
   },
   mounted() {
+    if (!this.user) {
+      this.getUserInfo()
+    }
+
     if (!(Array.isArray(this.notes) && this.notes.length > 0)) {
       this.getNotes()
     }
   },
   computed: {
-    ...mapState(['errors', 'notes']),
+    ...mapState(['user', 'errors', 'notes']),
+    ...mapGetters(['checkPermission']),
+
     titleOfTheNoteToBeDeleted(): string | null {
       if (this.removableNoteId) {
         return this.notes.find((note: Note) => note._id === this.removableNoteId)?.title || null
@@ -130,7 +137,8 @@ export default defineComponent({
     }
   },
   methods: {
-    ...mapActions(['getNotes', 'createNoteRequest', 'deleteNote']),
+    ...mapActions(['getUserInfo', 'getNotes', 'createNoteRequest', 'deleteNote']),
+
     generateNote() {
       const randomTitleAndNoteStr: string = Math.random().toString().slice(2)
       const labels = ['Новости', 'Рубрика', 'Новинка', 'Флуд']
@@ -231,19 +239,13 @@ export default defineComponent({
 }
 
 .notes__list {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0 -25px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 25px;
   list-style: none;
 }
 
 .notes__item {
-  width: 50%;
-  margin-bottom: 50px;
-  padding: 0 25px;
-}
-
-.notes__item-inner {
   padding: 12px 24px;
   font-size: 20px;
   color: #282828;
@@ -288,6 +290,11 @@ export default defineComponent({
   box-shadow: 0 1px 12px 0 rgba(0, 0, 0, .2);
   cursor: pointer;
   transition: .2s;
+}
+
+.notes__item-controls-btn._more:hover {
+  background-color: #282828;
+  color: whitesmoke;
 }
 
 .notes__item-controls-btn._update:hover {

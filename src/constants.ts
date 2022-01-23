@@ -4,3 +4,15 @@ export enum DeletionStates {
     DELETING = 'DELETING',
     DONE = 'DONE'
 }
+
+export enum ROLES {
+    moderator = `moderator`,
+    superUser = `superUser`,
+    user = `user`,
+}
+
+export enum PERMISSIONS {
+    createNote = `createNote`,
+    updateNote = `updateNote`,
+    deleteNote = `deleteNote`,
+}

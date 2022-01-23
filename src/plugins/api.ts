@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {User, Note, CreatableNote} from '@/typings'
+import {User, Note, CreatableNote, UserForPanel} from '@/typings'
 
 export const api = axios.create({
     baseURL: 'http://localhost:8000',
@@ -9,6 +9,11 @@ export const api = axios.create({
 
 export const getUser = async (): Promise<User> => {
     return (await api.get('/self')).data
+}
+
+export const getListOfUsers = async (): Promise<{ users: UserForPanel[] }> => {
+    console.log(1)
+    return (await api.get('/users')).data
 }
 
 export const doLogin = async (loginForm: { login: string, password: string }): Promise<User> => {
@@ -47,4 +52,8 @@ export const deleteNote = async (nodeId: string): Promise<void> => {
         throw error
     }
     await api.delete(`/note/${nodeId}`)
+}
+
+export const updateRoles = async (userId: string, roles: []): Promise<User> => {
+    return (await api.put(`/updateRoles`, {id: userId, roles})).data
 }

@@ -1,6 +1,13 @@
+import {ROLES} from '@/constants'
+
 export interface User {
+    permissions: string[]
     _id: string
     userName: string
+}
+
+export interface UserForPanel extends User {
+    roles: typeof ROLES[]
 }
 
 export interface Note {
