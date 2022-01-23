@@ -25,8 +25,11 @@
       <button
         class="btn btn--success"
         type="button"
+        :disabled="!this.isRolesDiffer"
         @click="saveUserRoles"
-      >save</button>
+      >
+        save
+      </button>
     </div>
   </div>
 </template>
@@ -53,11 +56,11 @@ export default defineComponent({
     }
   },
   emits: {
-    changeUserRoles: (updatedUser: UpdatedUser) => {}
+    changeUserRoles: (updatedUser: UpdatedUser) => {
+    }
   },
   data() {
     return {
-      // userRoles: Vue.util.extend({}, this.user.roles),
       userRoles: [...this.user.roles],
 
       ROLES
@@ -77,8 +80,6 @@ export default defineComponent({
     changeUserRole(role: ROLES) {
       const existingRoleIndex = this.userRoles.findIndex(userRole => userRole === role)
 
-      // console.log(existingRoleIndex, role)
-
       if (existingRoleIndex === -1) {
         this.userRoles.push(role)
       } else {
@@ -93,14 +94,15 @@ export default defineComponent({
     },
     saveUserRoles() {
       if (!this.isRolesDiffer) {
-        alert('Сначала поменяй роли')
         return
       } else {
-        this.updateRoles([this.user._id, this.userRoles]).then(() => {
-          alert('then')
-        }).catch(() => {
-          alert('error')
-        })
+        this.updateRoles([{id: this.user._id, roles: this.userRoles}])
+          .then(() => {
+            alert('roles updated')
+          })
+          .catch(() => {
+            alert('error')
+          })
       }
     }
   }

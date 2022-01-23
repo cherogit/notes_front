@@ -119,8 +119,9 @@ export const store = createStore<State>({
         deleteNote: actionFactory('deleteNote', 'removeNote', async (noteId: string) => {
             return await api.deleteNote(noteId)
         }),
-        updateRoles: actionFactory('updateRoles', '',async ([userId, roles]) => {
-            return await api.updateRoles(userId, roles)
+        updateRoles: actionFactory('updateRoles', '',async (users) => {
+            console.log(users)
+            return await api.updateRoles(users)
         }),
     }
 })

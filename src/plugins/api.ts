@@ -54,6 +54,6 @@ export const deleteNote = async (nodeId: string): Promise<void> => {
     await api.delete(`/note/${nodeId}`)
 }
 
-export const updateRoles = async (userId: string, roles: []): Promise<User> => {
-    return (await api.put(`/updateRoles`, {id: userId, roles})).data
+export const updateRoles = async (users: [{id: string, roles: []}]): Promise<{ users: UserForPanel[] }> => {
+    return (await api.put(`/updateRoles`, users)).data
 }
