@@ -12,7 +12,6 @@ export const getUser = async (): Promise<User> => {
 }
 
 export const getListOfUsers = async (): Promise<{ users: UserForPanel[] }> => {
-    console.log(1)
     return (await api.get('/users')).data
 }
 
@@ -41,8 +40,6 @@ export const createNote = async (noteCreationFormData: { title: string, note: st
 }
 
 export const updateNote = async (noteId: string, noteUpdatingFormData: { title: string, note: string, labels: string, publication_date: string }): Promise<Note> => {
-    console.log(noteUpdatingFormData)
-
     return (await api.put(`/update/${noteId}`, noteUpdatingFormData)).data
 }
 

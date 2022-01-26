@@ -88,7 +88,6 @@ export const store = createStore<State>({
             return await api.getUser()
         }),
         getListOfUsers: actionFactory('getListOfUsers', 'setListOfUsers', async () => {
-            console.log('action')
             const result = await api.getListOfUsers()
             return result.users
         }),
@@ -113,15 +112,17 @@ export const store = createStore<State>({
         createNoteRequest: actionFactory('createNote', 'appendNote', async (noteCreationFormData) => {
             return await api.createNote(noteCreationFormData)
         }),
+        // TODO mutationName
         updateNote: actionFactory('updateNote', '',async ([noteId, noteUpdatingFormData]) => {
             return await api.updateNote(noteId, noteUpdatingFormData)
         }),
         deleteNote: actionFactory('deleteNote', 'removeNote', async (noteId: string) => {
             return await api.deleteNote(noteId)
         }),
-        updateRoles: actionFactory('updateRoles', '',async (users) => {
-            console.log(users)
-            return await api.updateRoles(users)
+        // TODO mutationName
+        updateRoles: actionFactory('updateRoles', 'setListOfUsers',async (users) => {
+            const result = await api.updateRoles(users)
+            return result.users
         }),
     }
 })
