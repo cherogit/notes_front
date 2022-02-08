@@ -19,8 +19,13 @@ type State = typeof initialState
 //
 // setError(initialState, {key: 'getUser2', error: null})
 
+// S - State
+// R - RootState
+// P - Payload
 type MyActionHandler<S, R, P> = (this: VuexStore<R>, injectee: ActionContext<S, R>, payload: P) => any
 
+// P - Payload
+// R - Result
 const actionFactory = <P, R>(actionName: string, mutationName: string, payloadGetter: (p: P) => Promise<R>): MyActionHandler<State, State, P> => {
     const fn: MyActionHandler<State, State, P> = async ({commit}, params) => {
         commit('setError', {action: actionName, error: null})
@@ -62,8 +67,19 @@ export const store = createStore<State>({
         setUser(state, user: User) {
             state.user = user
         },
-        setListOfUsers(state, users: UserForPanel[]) {
+        replaceAllUsers(state, users: UserForPanel[]) {
             state.users = users
+        },
+        updateUserRoles(state, users: UserForPanel[]) {
+            if (state.users) {
+                users.forEach(user => {
+                    const existingUserIndex = state.users.findIndex(stateUser => stateUser._id === user._id)
+
+                    if (existingUserIndex !== -1) {
+                        state.users[existingUserIndex] = user
+                    }
+                })
+            }
         },
         setNotes(state, notes: Note[]) {
             state.notes = notes
@@ -87,7 +103,7 @@ export const store = createStore<State>({
         getUserInfo: actionFactory('getUserInfo', 'setUser', async () => {
             return await api.getUser()
         }),
-        getListOfUsers: actionFactory('getListOfUsers', 'setListOfUsers', async () => {
+        getListOfUsers: actionFactory('getListOfUsers', 'replaceAllUsers', async () => {
             const result = await api.getListOfUsers()
             return result.users
         }),
@@ -120,7 +136,7 @@ export const store = createStore<State>({
             return await api.deleteNote(noteId)
         }),
         // TODO mutationName
-        updateRoles: actionFactory('updateRoles', 'setListOfUsers',async (users) => {
+        updateRoles: actionFactory('updateRoles', 'updateUserRoles',async (users) => {
             const result = await api.updateRoles(users)
             return result.users
         }),

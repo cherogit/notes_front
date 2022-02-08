@@ -2,25 +2,19 @@
   <div class="user-card">
     <div class="user-card__column">
       {{ user.login }}
-      <hr>
-      {{ userRoles }}
-      <hr>
-      isUpdate: {{ isRolesDiffer }}
     </div>
-    <div
+    <label
       v-for="(role, index) of ROLES"
       :key="index"
       class="user-card__column"
     >
-      <label>
-        <input
-          type="checkbox"
-          :name="role"
-          :checked="user.roles.includes(role)"
-          @change="changeUserRole(role)"
-        >
-      </label>
-    </div>
+      <input
+        type="checkbox"
+        :name="role"
+        :checked="user.roles.includes(role)"
+        @change="changeUserRole(role)"
+      >
+    </label>
     <div class="user-card__column">
       <button
         class="btn btn--success"
@@ -113,11 +107,16 @@ export default defineComponent({
 .user-card {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .user-card__column {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   width: 20%;
-  padding: 25px 0;
+  height: 70px;
+  margin: 0;
   border-bottom: 1px solid #282828;
   text-align: center;
 
