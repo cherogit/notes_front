@@ -49,10 +49,10 @@ export default defineComponent({
       }
     }
   },
-  emits: {
-    changeUserRoles: (updatedUser: UpdatedUser) => {
-    }
-  },
+  // emits: {
+  //   changeUserRoles: (updatedUser: UpdatedUser) => {},
+  //   saveUserRoles: (updatedUser: UpdatedUser[]) => {}
+  // },
   data() {
     return {
       userRoles: [...this.user.roles],
@@ -69,8 +69,6 @@ export default defineComponent({
     },
   },
   methods: {
-    ...mapActions(['updateRoles']),
-
     changeUserRole(role: ROLES) {
       const existingRoleIndex = this.userRoles.findIndex(userRole => userRole === role)
 
@@ -90,13 +88,7 @@ export default defineComponent({
       if (!this.isRolesDiffer) {
         return
       } else {
-        this.updateRoles([{id: this.user._id, roles: this.userRoles}])
-          .then(() => {
-            alert('roles updated')
-          })
-          .catch(() => {
-            alert('error')
-          })
+        this.$emit('saveUserRoles', [{id: this.user._id, roles: this.userRoles}])
       }
     }
   }

@@ -1,5 +1,5 @@
 import {Action, ActionContext, createStore, Store as VuexStore} from 'vuex'
-import {Note, User, UserForPanel} from '@/typings'
+import {Note, User, UserWithRoles} from '@/typings'
 import {InjectionKey} from 'vue'
 import * as api from '@/plugins/api'
 
@@ -7,7 +7,7 @@ type ActionError = Error | null | { [K: string]: any }
 
 const initialState = {
     user: null as User | null,
-    users: [] as UserForPanel[],
+    users: [] as UserWithRoles[],
     notes: [] as Note[],
     errors: {} as Record<string, ActionError>
 }
@@ -67,10 +67,10 @@ export const store = createStore<State>({
         setUser(state, user: User) {
             state.user = user
         },
-        replaceAllUsers(state, users: UserForPanel[]) {
+        replaceAllUsers(state, users: UserWithRoles[]) {
             state.users = users
         },
-        updateUserRoles(state, users: UserForPanel[]) {
+        appendUsers(state, users: UserWithRoles[]) {
             if (state.users) {
                 users.forEach(user => {
                     const existingUserIndex = state.users.findIndex(stateUser => stateUser._id === user._id)
@@ -136,8 +136,8 @@ export const store = createStore<State>({
             return await api.deleteNote(noteId)
         }),
         // TODO mutationName
-        updateRoles: actionFactory('updateRoles', 'updateUserRoles',async (users) => {
-            const result = await api.updateRoles(users)
+        updateUsers: actionFactory('updateUsers', 'appendUsers',async (users) => {
+            const result = await api.updateUsers(users)
             return result.users
         }),
     }

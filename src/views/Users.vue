@@ -8,27 +8,28 @@
       <div class="users__columns">
         <h3>login</h3>
         <h3
-          v-for="(role, index) of ROLES"
-          :key="index"
+            v-for="(role, index) of ROLES"
+            :key="index"
         >
           {{ role }}
         </h3>
         <h3></h3>
       </div>
 
-
       <user-card
-        v-for="user in users"
-        :key="user._id"
-        :user="user"
-        @changeUserRoles="changeUserRoles"
+          v-for="user in users"
+          :key="user._id"
+          :user="user"
+          @changeUserRoles="changeUserRoles"
+          @saveUserRoles="updatedUser => saveRoles(updatedUser)"
       ></user-card>
     </form>
     <br>
     <button
-      class="btn btn--colored"
-      type="button"
-      @click="saveRoles"
+        class="btn btn--colored"
+        type="button"
+        :disabled="!updatedUsers.length"
+        @click="saveRoles(updatedUsers)"
     >
       save all
     </button>
@@ -60,20 +61,31 @@ export default defineComponent({
     ...mapState(['users', 'errors']),
   },
   methods: {
-    ...mapActions(['getListOfUsers']),
+    ...mapActions(['getListOfUsers', 'updateUsers']),
+
     changeUserRoles(updatedUser: UpdatedUser) {
+      console.log()
       const existingUserIndex = this.updatedUsers.findIndex(user => user.login === updatedUser.login)
 
       if (existingUserIndex !== -1) {
-        this.updatedUsers[existingUserIndex] = updatedUser
+        if (updatedUser.isRolesDiffer) {
+          this.updatedUsers[existingUserIndex] = updatedUser
+        } else {
+          this.updatedUsers.splice(existingUserIndex, 1)
+        }
       } else {
         this.updatedUsers.push(updatedUser)
       }
     },
-    saveRoles() {
-      const differUsers = this.updatedUsers.filter(user => user.isRolesDiffer)
-
-      console.log(differUsers)
+    saveRoles(users: [{ id: string, roles: [] }]) {
+      console.log('1', users)
+      this.updateUsers(users)
+          .then(() => {
+            alert('roles updated')
+          })
+          .catch(() => {
+            alert('error')
+          })
     }
   }
 })

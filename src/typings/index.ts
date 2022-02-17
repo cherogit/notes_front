@@ -6,7 +6,7 @@ export interface User {
     userName: string
 }
 
-export interface UserForPanel extends User {
+export interface UserWithRoles extends User {
     roles: typeof ROLES[]
 }
 
