@@ -65,7 +65,7 @@ export default defineComponent({
 
     changeUserRoles(updatedUser: UpdatedUser) {
       console.log()
-      const existingUserIndex = this.updatedUsers.findIndex(user => user.login === updatedUser.login)
+      const existingUserIndex = this.updatedUsers.findIndex(user => user.id === updatedUser.id)
 
       if (existingUserIndex !== -1) {
         if (updatedUser.isRolesDiffer) {
@@ -77,8 +77,9 @@ export default defineComponent({
         this.updatedUsers.push(updatedUser)
       }
     },
-    saveRoles(users: [{ id: string, roles: [] }]) {
-      console.log('1', users)
+    saveRoles(users: [{ id: string, roles: [], isRolesDiffer?: boolean }]) {
+      users.forEach(user => delete user['isRolesDiffer'])
+
       this.updateUsers(users)
           .then(() => {
             alert('roles updated')

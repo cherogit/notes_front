@@ -35,7 +35,7 @@ import {ROLES} from '@/constants'
 import {mapActions} from 'vuex'
 
 export interface UpdatedUser {
-  login: string
+  id: string,
   roles: ROLES[]
   isRolesDiffer: boolean
 }
@@ -45,14 +45,9 @@ export default defineComponent({
   props: {
     user: {
       type: Object,
-      default: () => {
-      }
+      default: () => {}
     }
   },
-  // emits: {
-  //   changeUserRoles: (updatedUser: UpdatedUser) => {},
-  //   saveUserRoles: (updatedUser: UpdatedUser[]) => {}
-  // },
   data() {
     return {
       userRoles: [...this.user.roles],
@@ -79,7 +74,7 @@ export default defineComponent({
       }
 
       this.$emit('changeUserRoles', {
-        login: this.user.login,
+        id: this.user._id,
         roles: this.userRoles,
         isRolesDiffer: this.isRolesDiffer
       })
