@@ -1,3 +1,7 @@
+// Pinia Store
+import {defineStore} from 'pinia'
+
+// Vuex Store
 import {Action, ActionContext, createStore, Store as VuexStore} from 'vuex'
 import {Note, User, UserWithRoles} from '@/typings'
 import {InjectionKey} from 'vue'
@@ -71,15 +75,15 @@ export const store = createStore<State>({
             state.users = users
         },
         appendUsers(state, users: UserWithRoles[]) {
-            if (state.users) {
-                users.forEach(user => {
-                    const existingUserIndex = state.users.findIndex(stateUser => stateUser._id === user._id)
+            users.forEach(user => {
+                const existingUserIndex = state.users.findIndex(stateUser => stateUser._id === user._id)
 
-                    if (existingUserIndex !== -1) {
-                        state.users[existingUserIndex] = user
-                    }
-                })
-            }
+                if (existingUserIndex !== -1) {
+                    state.users[existingUserIndex] = user
+                } else {
+                    state.users.push(user)
+                }
+            })
         },
         setNotes(state, notes: Note[]) {
             state.notes = notes
@@ -128,15 +132,13 @@ export const store = createStore<State>({
         createNoteRequest: actionFactory('createNote', 'appendNote', async (noteCreationFormData) => {
             return await api.createNote(noteCreationFormData)
         }),
-        // TODO mutationName
-        updateNote: actionFactory('updateNote', '',async ([noteId, noteUpdatingFormData]) => {
+        updateNote: actionFactory('updateNote', '', async ([noteId, noteUpdatingFormData]) => {
             return await api.updateNote(noteId, noteUpdatingFormData)
         }),
         deleteNote: actionFactory('deleteNote', 'removeNote', async (noteId: string) => {
             return await api.deleteNote(noteId)
         }),
-        // TODO mutationName
-        updateUsers: actionFactory('updateUsers', 'appendUsers',async (users) => {
+        updateUsers: actionFactory('updateUsers', 'appendUsers', async (users) => {
             const result = await api.updateUsers(users)
             return result.users
         }),

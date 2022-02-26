@@ -64,7 +64,6 @@ export default defineComponent({
     ...mapActions(['getListOfUsers', 'updateUsers']),
 
     changeUserRoles(updatedUser: UpdatedUser) {
-      console.log()
       const existingUserIndex = this.updatedUsers.findIndex(user => user.id === updatedUser.id)
 
       if (existingUserIndex !== -1) {
@@ -81,12 +80,8 @@ export default defineComponent({
       users.forEach(user => delete user['isRolesDiffer'])
 
       this.updateUsers(users)
-          .then(() => {
-            alert('roles updated')
-          })
-          .catch(() => {
-            alert('error')
-          })
+          .then()
+          .catch(err => console.error(err))
     }
   }
 })
