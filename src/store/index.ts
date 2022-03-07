@@ -78,7 +78,7 @@ export const store = createStore<State>({
             users.forEach(user => {
                 const existingUserIndex = state.users.findIndex(stateUser => stateUser._id === user._id)
 
-                if (existingUserIndex !== -1) {
+                if (existingUserIndex >= 0) {
                     state.users[existingUserIndex] = user
                 } else {
                     state.users.push(user)
