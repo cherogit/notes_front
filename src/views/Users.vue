@@ -79,9 +79,7 @@ export default defineComponent({
     saveRoles(users: [{ id: string, roles: [], isRolesDiffer?: boolean }]) {
       users.forEach(user => delete user['isRolesDiffer'])
 
-      this.updateUsers(users)
-          .then()
-          .catch(err => console.error(err))
+      this.updateUsers(users).catch(err => console.error(err))
     }
   }
 })
