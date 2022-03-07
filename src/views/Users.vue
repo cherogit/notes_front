@@ -8,27 +8,28 @@
       <div class="users__columns">
         <h3>login</h3>
         <h3
-          v-for="(role, index) of ROLES"
-          :key="index"
+            v-for="(role, index) of ROLES"
+            :key="index"
         >
           {{ role }}
         </h3>
         <h3></h3>
       </div>
 
-
       <user-card
-        v-for="user in users"
-        :key="user._id"
-        :user="user"
-        @changeUserRoles="changeUserRoles"
+          v-for="user in users"
+          :key="user._id"
+          :user="user"
+          @changeUserRoles="changeUserRoles"
+          @saveUserRoles="updatedUser => saveRoles(updatedUser)"
       ></user-card>
     </form>
     <br>
     <button
-      class="btn btn--colored"
-      type="button"
-      @click="saveRoles"
+        class="btn btn--colored"
+        type="button"
+        :disabled="!updatedUsers.length"
+        @click="saveRoles(updatedUsers)"
     >
       save all
     </button>
@@ -60,20 +61,27 @@ export default defineComponent({
     ...mapState(['users', 'errors']),
   },
   methods: {
-    ...mapActions(['getListOfUsers']),
+    ...mapActions(['getListOfUsers', 'updateUsers']),
+
     changeUserRoles(updatedUser: UpdatedUser) {
-      const existingUserIndex = this.updatedUsers.findIndex(user => user.login === updatedUser.login)
+      const existingUserIndex = this.updatedUsers.findIndex(user => user.id === updatedUser.id)
 
       if (existingUserIndex !== -1) {
-        this.updatedUsers[existingUserIndex] = updatedUser
+        if (updatedUser.isRolesDiffer) {
+          this.updatedUsers[existingUserIndex] = updatedUser
+        } else {
+          this.updatedUsers.splice(existingUserIndex, 1)
+        }
       } else {
         this.updatedUsers.push(updatedUser)
       }
     },
-    saveRoles() {
-      const differUsers = this.updatedUsers.filter(user => user.isRolesDiffer)
+    saveRoles(users: [{ id: string, roles: [], isRolesDiffer?: boolean }]) {
+      users.forEach(user => delete user['isRolesDiffer'])
 
-      console.log(differUsers)
+      this.updateUsers(users)
+          .then()
+          .catch(err => console.error(err))
     }
   }
 })

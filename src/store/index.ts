@@ -1,5 +1,9 @@
+// Pinia Store
+import {defineStore} from 'pinia'
+
+// Vuex Store
 import {Action, ActionContext, createStore, Store as VuexStore} from 'vuex'
-import {Note, User, UserForPanel} from '@/typings'
+import {Note, User, UserWithRoles} from '@/typings'
 import {InjectionKey} from 'vue'
 import * as api from '@/plugins/api'
 
@@ -7,7 +11,7 @@ type ActionError = Error | null | { [K: string]: any }
 
 const initialState = {
     user: null as User | null,
-    users: [] as UserForPanel[],
+    users: [] as UserWithRoles[],
     notes: [] as Note[],
     errors: {} as Record<string, ActionError>
 }
@@ -19,8 +23,13 @@ type State = typeof initialState
 //
 // setError(initialState, {key: 'getUser2', error: null})
 
+// S - State
+// R - RootState
+// P - Payload
 type MyActionHandler<S, R, P> = (this: VuexStore<R>, injectee: ActionContext<S, R>, payload: P) => any
 
+// P - Payload
+// R - Result
 const actionFactory = <P, R>(actionName: string, mutationName: string, payloadGetter: (p: P) => Promise<R>): MyActionHandler<State, State, P> => {
     const fn: MyActionHandler<State, State, P> = async ({commit}, params) => {
         commit('setError', {action: actionName, error: null})
@@ -62,8 +71,19 @@ export const store = createStore<State>({
         setUser(state, user: User) {
             state.user = user
         },
-        setListOfUsers(state, users: UserForPanel[]) {
+        replaceAllUsers(state, users: UserWithRoles[]) {
             state.users = users
+        },
+        appendUsers(state, users: UserWithRoles[]) {
+            users.forEach(user => {
+                const existingUserIndex = state.users.findIndex(stateUser => stateUser._id === user._id)
+
+                if (existingUserIndex !== -1) {
+                    state.users[existingUserIndex] = user
+                } else {
+                    state.users.push(user)
+                }
+            })
         },
         setNotes(state, notes: Note[]) {
             state.notes = notes
@@ -87,8 +107,7 @@ export const store = createStore<State>({
         getUserInfo: actionFactory('getUserInfo', 'setUser', async () => {
             return await api.getUser()
         }),
-        getListOfUsers: actionFactory('getListOfUsers', 'setListOfUsers', async () => {
-            console.log('action')
+        getListOfUsers: actionFactory('getListOfUsers', 'replaceAllUsers', async () => {
             const result = await api.getListOfUsers()
             return result.users
         }),
@@ -113,14 +132,15 @@ export const store = createStore<State>({
         createNoteRequest: actionFactory('createNote', 'appendNote', async (noteCreationFormData) => {
             return await api.createNote(noteCreationFormData)
         }),
-        updateNote: actionFactory('updateNote', '',async ([noteId, noteUpdatingFormData]) => {
+        updateNote: actionFactory('updateNote', '', async ([noteId, noteUpdatingFormData]) => {
             return await api.updateNote(noteId, noteUpdatingFormData)
         }),
         deleteNote: actionFactory('deleteNote', 'removeNote', async (noteId: string) => {
             return await api.deleteNote(noteId)
         }),
-        updateRoles: actionFactory('updateRoles', '',async ([userId, roles]) => {
-            return await api.updateRoles(userId, roles)
+        updateUsers: actionFactory('updateUsers', 'appendUsers', async (users) => {
+            const result = await api.updateUsers(users)
+            return result.users
         }),
     }
 })
