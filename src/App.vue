@@ -26,8 +26,8 @@
     <div v-if="!!user || isGeneralPages">
       <router-view/>
     </div>
-    <div v-else-if="!!errors.getUserInfo">
-      <h2>{{ errors.getUserInfo.error.status }}: {{ errors.getUserInfo.error.message }}</h2>
+    <div v-if="userInfoLoader.isRejected">
+      <h2>{{ userInfoLoader.error?.status }} {{ userInfoLoader.error?.message }}</h2>
       <br>
 
       <router-link class="btn btn--colored" to="/auth">authorization</router-link>
@@ -36,34 +36,47 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue'
-import {mapActions, mapState} from 'vuex'
+import {ref, defineComponent, Ref, onMounted, computed} from 'vue'
+import {useStore} from '@/store/'
+import {storeToRefs} from 'pinia'
+import {useApiWrapper, useAsyncWrapper} from "@/util/hooks"
+import {useRoute} from 'vue-router'
+import {ApiError} from "@/typings"
+
+const useUser = (options: { checkOnMount: boolean }) => {
+  const main = useStore()
+  const {user} = storeToRefs(main)
+  const userInfoLoader = useApiWrapper(main.getUserInfo)
+
+  if (options.checkOnMount) {
+    onMounted(() => {
+      if (!user.value) {
+        userInfoLoader.run()
+      }
+    })
+  }
+
+  return {
+    user, userInfoLoader
+  }
+}
 
 export default defineComponent({
   name: 'App',
-  mounted() {
-    if (!this.user) {
-      this.getUserInfo()
-    }
+  setup: function () {
+    const route = useRoute()
+    const {user, userInfoLoader} = useUser({checkOnMount: true})
 
-    console.log(this.errors)
-  },
-  computed: {
-    ...mapState([
-      'user',
-      'errors'
-    ]),
-    isGeneralPages(): boolean {
-      return ['/auth', '/registration'].includes(this.$route.path)
-    },
-  },
-  methods: {
-    ...mapActions(['getUserInfo', 'logoutRequest']),
+    const inputRef: Ref<string> = ref('')
+    // const callRandomAction = useAsyncWrapper(main.randomFallAction)
 
-    logout() {
-      this.logoutRequest()
-      this.$router.push({path: '/'})
-    }
+    const isGeneralPages = computed(() => {
+      return ['/auth', '/registration'].includes(route.path)
+    })
+
+    // const logout = main.logoutRequest()
+
+    return {user, inputRef, userInfoLoader, isGeneralPages}
   }
 });
 </script>

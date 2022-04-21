@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {User, Note, CreatableNote, UserWithRoles} from '@/typings'
+import {User, Note, CreatableNote, UserWithRoles, ApiError} from '@/typings'
 
 export const api = axios.create({
     baseURL: 'http://localhost:8000',
@@ -8,7 +8,16 @@ export const api = axios.create({
 })
 
 export const getUser = async (): Promise<User> => {
-    return (await api.get('/self')).data
+    try {
+        return (await api.get('/self')).data
+    } catch (err: any) {
+        if (typeof err?.response?.data?.error?.message === "string") {
+            const error = new Error(err.response.data.error.message) as ApiError
+            error.status = err.response.data.error.status
+            throw error
+        }
+        throw err
+    }
 }
 
 export const getListOfUsers = async (): Promise<{ users: UserWithRoles[] }> => {
@@ -51,6 +60,6 @@ export const deleteNote = async (nodeId: string): Promise<void> => {
     await api.delete(`/note/${nodeId}`)
 }
 
-export const updateUsers = async (users: [{id: string, roles: []}]): Promise<{ users: UserWithRoles[] }> => {
+export const updateUsers = async (users: [{ id: string, roles: [] }]): Promise<{ users: UserWithRoles[] }> => {
     return (await api.put(`/updateUsers`, users)).data
 }

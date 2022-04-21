@@ -1,5 +1,9 @@
 import {ROLES} from '@/constants'
 
+export interface ApiError extends Error {
+    status: number
+}
+
 export interface User {
     permissions: string[]
     _id: string
