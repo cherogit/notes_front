@@ -4,7 +4,7 @@ import {defineStore} from 'pinia'
 // Vuex Store
 // import {Action, ActionContext, createStore, Store as VuexStore} from 'vuex'
 import {Note, User, UserWithRoles} from '@/typings'
-import {InjectionKey} from 'vue'
+import {InjectionKey, Ref} from 'vue'
 import * as api from '@/plugins/api'
 import {delay, rejectAfter} from "@/util"
 
@@ -141,18 +141,18 @@ export const useStore = defineStore('main', {
         //     const result = await api.getListOfUsers()
         //     return result.users
         // }),
-        // authRequest: actionFactory('authRequest', 'setUser', async loginForm => {
-        //     return await api.doLogin(loginForm)
-        // }),
+        authRequest: async (loginForm: { login: Ref<string>, password: Ref<string> }) => {
+            return await api.doLogin(loginForm)
+        },
         // registrationRequest: actionFactory('registrationRequest', 'setUser', async registrationForm => {
         //     return await api.registration(registrationForm)
         // }),
 
-        async logoutRequest() {
-            await api.doLogout()
-            // dispatch('getUserInfo')
-            // commit('setUser', null)
-        },
+        // async logoutRequest() {
+        //     await api.doLogout()
+        //     // dispatch('getUserInfo')
+        //     // commit('setUser', null)
+        // },
         // getNotes: actionFactory('getNotes', 'setNotes', async () => {
         //     const result = await api.getNotes()
         //     return result.notes

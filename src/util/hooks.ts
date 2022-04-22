@@ -15,8 +15,7 @@ export const useAsyncWrapper = <T extends (...args: any[]) => any, E extends Err
         isRejected: false,
         error: null as E | null,
         result: null as Awaited<ReturnType<T>> | null,
-        run: async () => {
-        }
+        run: async () => {}
     })
 
     state.run = async (...params: Parameters<T>): Promise<void> => {

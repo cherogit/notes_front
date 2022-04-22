@@ -5,75 +5,91 @@
       <label class="label">
         <div class="label__name">login</div>
         <input class="input" v-model="login" type="text" name="login">
-        <span v-if="formErrors.login">Поле login {{ formErrors.login }}</span>
+<!--        <span v-if="formErrors.login">Поле login {{ formErrors.login }}</span>-->
       </label>
       <label class="label">
         <div class="label__name">password</div>
         <input class="input" v-model="password" type="password" name="password">
-        <span v-if="formErrors.password">Поле password {{ formErrors.password }}</span>
+<!--        <span v-if="formErrors.password">Поле password {{ formErrors.password }}</span>-->
       </label>
-      <button class="btn btn--colored" type="button" @click="authorization">join</button>
+<!--      <button class="btn btn&#45;&#45;colored" type="button" @click="authorization">join</button>-->
     </form>
-    <p v-if="errors.authRequest">
-      {{ errors.authRequest }}
-    </p>
+<!--    <p v-if="errors.authRequest">-->
+<!--      {{ errors.authRequest }}-->
+<!--    </p>-->
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue'
-import {mapActions, mapState} from 'vuex'
+import {defineComponent, Ref, ref} from 'vue'
+import {useStore} from '@/store'
+import {useApiWrapper} from '@/util/hooks'
+
+const useAuth = (loginForm: {login: Ref<string>, password: Ref<string>}) => {
+  const main = useStore()
+  const authorization = useApiWrapper(main.authRequest(loginForm))
+
+  return {
+    authorization
+  }
+}
 
 export default defineComponent({
   name: 'Auth',
-  data() {
+  setup() {
+    const login = ref('')
+    const password = ref('')
+
+    const { authorization } = useAuth({login, password})
+
     return {
-      login: '',
-      password: ''
+      login,
+      password,
+      authorization
     }
   },
-  computed: {
-    ...mapState([
-      'errors'
-    ]),
-    formErrors() {
-      const errors = {
-        login: null,
-        password: null,
-        // message: this.errors.authRequest?.message || null,
-      }
-
-      const errorsArr = this.errors.authRequest?.errors
-
-      if (Array.isArray(errorsArr)) {
-        const loginError = errorsArr.find(err => err.instancePath.startsWith('/login'))
-
-        if (loginError) {
-          errors.login = loginError.message
-        }
-
-        const passwordError = errorsArr.find(err => err.instancePath.startsWith('/password'))
-
-        if (passwordError) {
-          errors.password = passwordError.message
-        }
-      }
-
-      return errors
-    }
-  },
-  methods: {
-    ...mapActions(['authRequest']),
-    authorization() {
-      this.authRequest({login: this.login, password: this.password}).then(() => {
-        this.$nextTick(() => {
-          if (!this.errors.authRequest) {
-            this.$router.push({path: '/'})
-          }
-        })
-      })
-    }
-  }
+  // computed: {
+  //   ...mapState([
+  //     'errors'
+  //   ]),
+  //   formErrors() {
+  //     const errors = {
+  //       login: null,
+  //       password: null,
+  //       // message: this.errors.authRequest?.message || null,
+  //     }
+  //
+  //     const errorsArr = this.errors.authRequest?.errors
+  //
+  //     if (Array.isArray(errorsArr)) {
+  //       const loginError = errorsArr.find(err => err.instancePath.startsWith('/login'))
+  //
+  //       if (loginError) {
+  //         errors.login = loginError.message
+  //       }
+  //
+  //       const passwordError = errorsArr.find(err => err.instancePath.startsWith('/password'))
+  //
+  //       if (passwordError) {
+  //         errors.password = passwordError.message
+  //       }
+  //     }
+  //
+  //     return errors
+  //   }
+  // },
+  // methods: {
+  //   ...mapActions(['authRequest']),
+  //   authorization() {
+  //     this.authRequest({login: this.login, password: this.password}).then(() => {
+  //       this.$nextTick(() => {
+  //         if (!this.errors.authRequest) {
+  //           this.$router.push({path: '/'})
+  //         }
+  //       })
+  //     })
+  //   }
+  // }
 })
 </script>
 

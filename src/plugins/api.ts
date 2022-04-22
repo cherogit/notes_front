@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {User, Note, CreatableNote, UserWithRoles, ApiError} from '@/typings'
+import {Ref} from 'vue'
 
 export const api = axios.create({
     baseURL: 'http://localhost:8000',
@@ -24,7 +25,7 @@ export const getListOfUsers = async (): Promise<{ users: UserWithRoles[] }> => {
     return (await api.get('/users')).data
 }
 
-export const doLogin = async (loginForm: { login: string, password: string }): Promise<User> => {
+export const doLogin = async (loginForm: { login: Ref<string>, password: Ref<string> }): Promise<User> => {
     return (await api.post('/auth', loginForm)).data
 }
 

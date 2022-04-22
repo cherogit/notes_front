@@ -26,7 +26,7 @@
     <div v-if="!!user || isGeneralPages">
       <router-view/>
     </div>
-    <div v-if="userInfoLoader.isRejected">
+    <div v-else-if="userInfoLoader.isRejected">
       <h2>{{ userInfoLoader.error?.status }} {{ userInfoLoader.error?.message }}</h2>
       <br>
 
@@ -63,12 +63,9 @@ const useUser = (options: { checkOnMount: boolean }) => {
 
 export default defineComponent({
   name: 'App',
-  setup: function () {
+  setup() {
     const route = useRoute()
     const {user, userInfoLoader} = useUser({checkOnMount: true})
-
-    const inputRef: Ref<string> = ref('')
-    // const callRandomAction = useAsyncWrapper(main.randomFallAction)
 
     const isGeneralPages = computed(() => {
       return ['/auth', '/registration'].includes(route.path)
@@ -76,7 +73,7 @@ export default defineComponent({
 
     // const logout = main.logoutRequest()
 
-    return {user, inputRef, userInfoLoader, isGeneralPages}
+    return {user, userInfoLoader, isGeneralPages}
   }
 });
 </script>
