@@ -5,29 +5,39 @@
       <label class="label">
         <div class="label__name">login</div>
         <input class="input" v-model="login" type="text" name="login">
-<!--        <span v-if="formErrors.login">Поле login {{ formErrors.login }}</span>-->
+        <!--        <span v-if="formErrors.login">Поле login {{ formErrors.login }}</span>-->
       </label>
       <label class="label">
         <div class="label__name">password</div>
         <input class="input" v-model="password" type="password" name="password">
-<!--        <span v-if="formErrors.password">Поле password {{ formErrors.password }}</span>-->
+        <!--        <span v-if="formErrors.password">Поле password {{ formErrors.password }}</span>-->
       </label>
-<!--      <button class="btn btn&#45;&#45;colored" type="button" @click="authorization">join</button>-->
+      <button class="btn btn--colored" type="button" @click="authorization.run({login, password})">join</button>
     </form>
-<!--    <p v-if="errors.authRequest">-->
-<!--      {{ errors.authRequest }}-->
-<!--    </p>-->
+    <!--    <p v-if="errors.authRequest">-->
+    <!--      {{ errors.authRequest }}-->
+    <!--    </p>-->
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, Ref, ref} from 'vue'
+import {defineComponent, onMounted, Ref, ref} from 'vue'
 import {useStore} from '@/store'
 import {useApiWrapper} from '@/util/hooks'
 
-const useAuth = (loginForm: {login: Ref<string>, password: Ref<string>}) => {
+const useAuth = (loginForm: { login: string, password: string }) => {
   const main = useStore()
-  const authorization = useApiWrapper(main.authRequest(loginForm))
+  const cb = (loginForm: Parameters<typeof main.authRequest>[0]) => main.authRequest(loginForm)
+  const authorization = useApiWrapper(cb)
+
+  // function abc(param1: number, ...args: any[]) {
+  //   console.log(arguments)
+  //   console.log(...args)
+  // }
+
+  onMounted(() => {
+    authorization.run()
+  })
 
   return {
     authorization
@@ -40,7 +50,7 @@ export default defineComponent({
     const login = ref('')
     const password = ref('')
 
-    const { authorization } = useAuth({login, password})
+    const {authorization} = useAuth({login: login.value, password: password.value})
 
     return {
       login,

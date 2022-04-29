@@ -25,7 +25,7 @@ export const getListOfUsers = async (): Promise<{ users: UserWithRoles[] }> => {
     return (await api.get('/users')).data
 }
 
-export const doLogin = async (loginForm: { login: Ref<string>, password: Ref<string> }): Promise<User> => {
+export const doLogin = async (loginForm: { login: string, password: string }): Promise<User> => {
     return (await api.post('/auth', loginForm)).data
 }
 

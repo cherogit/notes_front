@@ -141,18 +141,18 @@ export const useStore = defineStore('main', {
         //     const result = await api.getListOfUsers()
         //     return result.users
         // }),
-        authRequest: async (loginForm: { login: Ref<string>, password: Ref<string> }) => {
+        authRequest: async (loginForm: { login: string, password: string }) => {
             return await api.doLogin(loginForm)
         },
         // registrationRequest: actionFactory('registrationRequest', 'setUser', async registrationForm => {
         //     return await api.registration(registrationForm)
         // }),
 
-        // async logoutRequest() {
-        //     await api.doLogout()
-        //     // dispatch('getUserInfo')
-        //     // commit('setUser', null)
-        // },
+        async logoutRequest() {
+            await api.doLogout()
+            // dispatch('getUserInfo')
+            // commit('setUser', null)
+        },
         // getNotes: actionFactory('getNotes', 'setNotes', async () => {
         //     const result = await api.getNotes()
         //     return result.notes

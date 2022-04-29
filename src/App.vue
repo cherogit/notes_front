@@ -64,6 +64,7 @@ const useUser = (options: { checkOnMount: boolean }) => {
 export default defineComponent({
   name: 'App',
   setup() {
+    const main = useStore()
     const route = useRoute()
     const {user, userInfoLoader} = useUser({checkOnMount: true})
 
@@ -71,7 +72,7 @@ export default defineComponent({
       return ['/auth', '/registration'].includes(route.path)
     })
 
-    // const logout = main.logoutRequest()
+    const logout = useApiWrapper(main.logoutRequest)
 
     return {user, userInfoLoader, isGeneralPages}
   }
