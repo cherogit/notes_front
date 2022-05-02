@@ -36,12 +36,11 @@
 </template>
 
 <script lang="ts">
-import {ref, defineComponent, Ref, onMounted, computed} from 'vue'
+import {defineComponent, onMounted, computed, toRefs, toRef, ref} from 'vue'
 import {useStore} from '@/store/'
 import {storeToRefs} from 'pinia'
-import {useApiWrapper, useAsyncWrapper} from "@/util/hooks"
+import {useApiWrapper} from '@/util/hooks'
 import {useRoute} from 'vue-router'
-import {ApiError} from "@/typings"
 
 const useUser = (options: { checkOnMount: boolean }) => {
   const main = useStore()
