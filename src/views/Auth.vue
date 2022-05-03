@@ -12,7 +12,7 @@
         <input class="input" v-model="password" type="password" name="password">
         <span v-if="authorization.isRejected && formErrors.password">Поле password {{ formErrors.password }}</span>
       </label>
-      <button class="btn btn--colored" type="button" @click="authorization.run({login, password})">join</button>
+      <button class="btn btn--colored" type="button" @click="auth">join</button>
     </form>
     <div v-if="authorization.isRejected">
       <h2>{{ authorization.error?.status }} {{ authorization.error?.message }}</h2>
@@ -21,9 +21,10 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, Ref, ref} from 'vue'
+import {computed, defineComponent, nextTick, onMounted, Ref, ref} from 'vue'
 import {useStore} from '@/store'
 import {useApiWrapper} from '@/util/hooks'
+import {useRouter} from 'vue-router'
 
 const useAuth = (loginForm: { login: string, password: string }) => {
   const main = useStore()
@@ -38,11 +39,11 @@ const useAuth = (loginForm: { login: string, password: string }) => {
 export default defineComponent({
   name: 'Auth',
   setup() {
+    const router = useRouter()
     const login = ref('')
     const password = ref('')
 
     const {authorization} = useAuth({login: login.value, password: password.value})
-
     const formErrors = computed(() => {
       const fieldsErrors = {
         login: null,
@@ -67,11 +68,21 @@ export default defineComponent({
       return fieldsErrors
     })
 
+    const auth = async () => {
+      await authorization.run({login: login.value, password: password.value})
+      await nextTick()
+
+      if (!authorization.error) {
+        await router.push({path: '/'})
+      }
+    }
+
     return {
       login,
       password,
       authorization,
-      formErrors
+      formErrors,
+      auth
     }
   }
 })

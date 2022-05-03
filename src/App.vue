@@ -48,9 +48,10 @@ const useUser = (options: { checkOnMount: boolean }) => {
   const userInfoLoader = useApiWrapper(main.getUserInfo)
 
   if (options.checkOnMount) {
-    onMounted(() => {
+    onMounted(async () => {
       if (!user.value) {
-        userInfoLoader.run()
+        await userInfoLoader.run()
+        user.value = userInfoLoader.result
       }
     })
   }
