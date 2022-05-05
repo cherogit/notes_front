@@ -70,7 +70,7 @@ export default defineComponent({
 
     const auth = async () => {
       await authorization.run({login: login.value, password: password.value})
-      await nextTick()
+      // await nextTick()
 
       if (!authorization.error) {
         await router.push({path: '/'})

@@ -26,7 +26,7 @@
     <div v-if="!!user || isGeneralPages">
       <router-view/>
     </div>
-    <div v-else-if="userInfoLoader.isRejected">
+    <div v-else-if="!user && (userInfoLoader.isRejected || userInfoLoader.isResolved)">
       <h2>{{ userInfoLoader.error?.status }} {{ userInfoLoader.error?.message }}</h2>
       <br>
 
@@ -40,7 +40,7 @@ import {defineComponent, onMounted, computed, toRefs, toRef, ref} from 'vue'
 import {useStore} from '@/store/'
 import {storeToRefs} from 'pinia'
 import {useApiWrapper} from '@/util/hooks'
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 
 const useUser = (options: { checkOnMount: boolean }) => {
   const main = useStore()
@@ -51,13 +51,13 @@ const useUser = (options: { checkOnMount: boolean }) => {
     onMounted(async () => {
       if (!user.value) {
         await userInfoLoader.run()
-        user.value = userInfoLoader.result
       }
     })
   }
 
   return {
-    user, userInfoLoader
+    user,
+    userInfoLoader
   }
 }
 
@@ -66,15 +66,19 @@ export default defineComponent({
   setup() {
     const main = useStore()
     const route = useRoute()
+    const router = useRouter()
     const {user, userInfoLoader} = useUser({checkOnMount: true})
 
     const isGeneralPages = computed(() => {
       return ['/auth', '/registration'].includes(route.path)
     })
 
-    const logout = useApiWrapper(main.logoutRequest)
+    const logout = async () => {
+      await useApiWrapper(main.logoutRequest).run()
+      await router.push({path: '/'})
+    }
 
-    return {user, userInfoLoader, isGeneralPages}
+    return {user, userInfoLoader, isGeneralPages, logout}
   }
 });
 </script>
