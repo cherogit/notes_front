@@ -146,7 +146,6 @@ export default defineComponent({
       formData.append('id', this.noteData._id || '')
 
       this.updateNote([this.idOfTheUpdatableNote, formData]).then(() => {
-        console.log(this.errors.updateNote)
         this.$nextTick(() => {
           if (!this.errors.updateNote) {
             this.$router.push({path: '/notes'})

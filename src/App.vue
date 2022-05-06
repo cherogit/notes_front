@@ -36,30 +36,11 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, computed, toRefs, toRef, ref} from 'vue'
+import {computed, defineComponent} from 'vue'
 import {useStore} from '@/store/'
-import {storeToRefs} from 'pinia'
 import {useApiWrapper} from '@/util/hooks'
 import {useRoute, useRouter} from 'vue-router'
-
-const useUser = (options: { checkOnMount: boolean }) => {
-  const main = useStore()
-  const {user} = storeToRefs(main)
-  const userInfoLoader = useApiWrapper(main.getUserInfo)
-
-  if (options.checkOnMount) {
-    onMounted(async () => {
-      if (!user.value) {
-        await userInfoLoader.run()
-      }
-    })
-  }
-
-  return {
-    user,
-    userInfoLoader
-  }
-}
+import {useUser} from '@/util/useUser'
 
 export default defineComponent({
   name: 'App',
@@ -80,7 +61,7 @@ export default defineComponent({
 
     return {user, userInfoLoader, isGeneralPages, logout}
   }
-});
+})
 </script>
 
 <style lang="less">

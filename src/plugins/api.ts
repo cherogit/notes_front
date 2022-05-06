@@ -26,14 +26,12 @@ export const getListOfUsers = async (): Promise<{ users: UserWithRoles[] }> => {
 }
 
 export const doLogin = async (loginForm: { login: string, password: string }): Promise<User> => {
-    // return (await api.post('/auth', loginForm)).data
     try {
         return (await api.post('/auth', loginForm)).data
     } catch (err: any) {
         if (Array.isArray(err?.response?.data?.errors)) {
             throw err?.response?.data?.errors
         } else {
-            console.log(err.response.data.error.message)
             const error = new Error(err.response.data.error.message) as ApiError
             error.status = err.response.data.error.status
             throw error

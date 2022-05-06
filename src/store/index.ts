@@ -134,24 +134,22 @@ export const useStore = defineStore('main', {
         randomFallAction: async (str: string) => {
             return await randomFallAsync(str, 1000)
         },
-        updateUser(payload: any) {
-            console.log(5, payload)
+        setUser(payload: any) {
             this.user = payload
         },
         async getUserInfo() {
             const res = await api.getUser()
-            console.log(res)
-            this.updateUser(res)
+            this.setUser(res)
         },
         async authRequest(loginForm: { login: string, password: string }) {
             const res = await api.doLogin(loginForm)
 
-            this.updateUser(res)
+            this.setUser(res)
         },
         async logoutRequest() {
             await api.doLogout()
 
-            this.updateUser(null)
+            this.setUser(null)
         },
         // getListOfUsers: actionFactory('getListOfUsers', 'replaceAllUsers', async () => {
         //     const result = await api.getListOfUsers()
