@@ -7,19 +7,19 @@
     </div>
 
     <div
-      v-if="isShowingPopup"
-      class="popup"
+        v-if="isShowingPopup"
+        class="popup"
     >
       <h3
-        v-if="titleOfTheNoteToBeDeleted"
-        class="popup__title"
+          v-if="titleOfTheNoteToBeDeleted"
+          class="popup__title"
       >
         Вы точно хотите удалить заметку {{ titleOfTheNoteToBeDeleted }}?
       </h3>
 
       <h5
-        v-if="deletionState !== DeletionStates.IDLE"
-        class="popup__status"
+          v-if="deletionState !== DeletionStates.IDLE"
+          class="popup__status"
       >
         <template v-if="deletionState === DeletionStates.PREPARING">
           Подождите...
@@ -32,30 +32,30 @@
         </template>
       </h5>
       <h5
-        v-if="errors.deleteNote"
-        class="popup__error"
+          v-if="errors.deleteNote"
+          class="popup__error"
       >
         Произошла ошибка <strong>{{ errors.deleteNote.message }}</strong> при удалении заметки
         <strong>{{ titleOfTheNoteToBeDeleted }}</strong>: попробуйте повторить операцию
       </h5>
 
       <div
-        v-if="deletionState !== DeletionStates.DONE"
-        class="popup__btns"
+          v-if="deletionState !== DeletionStates.DONE"
+          class="popup__btns"
       >
         <button
-          class="btn btn--success"
-          type="button"
-          :disabled="deletionState !== DeletionStates.IDLE"
-          @click="resetDeletion"
+            class="btn btn--success"
+            type="button"
+            :disabled="deletionState !== DeletionStates.IDLE"
+            @click="resetDeletion"
         >
           Отменить
         </button>
         <button
-          class="btn btn--warn"
-          type="button"
-          :disabled="deletionState !== DeletionStates.IDLE"
-          @click="requestDeleteNote"
+            class="btn btn--warn"
+            type="button"
+            :disabled="deletionState !== DeletionStates.IDLE"
+            @click="requestDeleteNote"
         >
           <template v-if="errors.deleteNote">Повторить</template>
           <template v-else>Да, хочу удалить</template>
@@ -65,29 +65,29 @@
 
     <ul class="notes__list">
       <li
-        v-for="(note, ndx) of notes"
-        :key="ndx"
-        class="notes__item"
+          v-for="(note, ndx) of notes"
+          :key="ndx"
+          class="notes__item"
       >
         <div class="notes__item-title">{{ note.title }}</div>
         <div class="notes__item-controls">
           <router-link
-            :to="{path: `/note/${note._id}/`}"
-            class="btn notes__item-controls-btn _more"
+              :to="{path: `/note/${note._id}/`}"
+              class="btn notes__item-controls-btn _more"
           >
             more
           </router-link>
           <button
-            class="btn notes__item-controls-btn _delete"
-            type="button"
-            @click="openNoteConfirmation(note._id)"
+              class="btn notes__item-controls-btn _delete"
+              type="button"
+              @click="openNoteConfirmation(note._id)"
           >
             delete
           </button>
           <router-link
-            v-if="checkPermission(PERMISSIONS.updateNote)"
-            :to="{path: `/update/${note._id}/`}"
-            class="btn notes__item-controls-btn _update"
+              v-if="checkPermission(PERMISSIONS.updateNote)"
+              :to="{path: `/update/${note._id}/`}"
+              class="btn notes__item-controls-btn _update"
           >
             update
           </router-link>
@@ -98,13 +98,29 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue'
+import {defineComponent, ref} from 'vue'
 import {mapActions, mapGetters, mapState} from 'vuex'
 import {DeletionStates, PERMISSIONS} from '@/constants'
 import {Note} from '@/typings'
+import {useStore} from '@/store'
+import {storeToRefs} from 'pinia'
+import {useUser} from '@/util/useUser'
 
 export default defineComponent({
   name: 'Notes',
+  setup() {
+    const main = useStore()
+    const {notes} = storeToRefs(main)
+    const isShowingPopup = ref(false)
+    const deletionState = ref(DeletionStates.IDLE)
+    const removableNoteId = ref('')
+    const {user, userInfoLoader} = useUser({checkOnMount: true})
+
+    return {
+      user,
+      userInfoLoader,
+    }
+  },
   data() {
     return {
       isShowingPopup: false,
@@ -174,23 +190,23 @@ export default defineComponent({
 
       setTimeout(() => {
         this.deleteNote(this.removableNoteId)
-          .then(() => {
-            this.$nextTick(() => {
-              if (this.errors.deleteNote) {
-                this.deletionState = DeletionStates.IDLE
+            .then(() => {
+              this.$nextTick(() => {
+                if (this.errors.deleteNote) {
+                  this.deletionState = DeletionStates.IDLE
 
-                return
-              } else {
-                this.deletionState = DeletionStates.DELETING
+                  return
+                } else {
+                  this.deletionState = DeletionStates.DELETING
 
-                setTimeout(() => {
-                  this.deletionState = DeletionStates.DONE
+                  setTimeout(() => {
+                    this.deletionState = DeletionStates.DONE
 
-                  setTimeout(this.resetDeletion, 1000)
-                }, 1000)
-              }
+                    setTimeout(this.resetDeletion, 1000)
+                  }, 1000)
+                }
+              })
             })
-          })
       }, 1000)
     }
   }

@@ -26,8 +26,8 @@
     <div v-if="!!user || isGeneralPages">
       <router-view/>
     </div>
-    <div v-else-if="!!errors.getUserInfo">
-      <h2>{{ errors.getUserInfo.error.status }}: {{ errors.getUserInfo.error.message }}</h2>
+    <div v-else-if="!user && (userInfoLoader.isRejected || userInfoLoader.isResolved)">
+      <h2>{{ userInfoLoader.error?.status }} {{ userInfoLoader.error?.message }}</h2>
       <br>
 
       <router-link class="btn btn--colored" to="/auth">authorization</router-link>
@@ -36,36 +36,32 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue'
-import {mapActions, mapState} from 'vuex'
+import {computed, defineComponent} from 'vue'
+import {useStore} from '@/store/'
+import {useApiWrapper} from '@/util/hooks'
+import {useRoute, useRouter} from 'vue-router'
+import {useUser} from '@/util/useUser'
 
 export default defineComponent({
   name: 'App',
-  mounted() {
-    if (!this.user) {
-      this.getUserInfo()
+  setup() {
+    const main = useStore()
+    const route = useRoute()
+    const router = useRouter()
+    const {user, userInfoLoader} = useUser({checkOnMount: true})
+
+    const isGeneralPages = computed(() => {
+      return ['/auth', '/registration'].includes(route.path)
+    })
+
+    const logout = async () => {
+      await useApiWrapper(main.logoutRequest).run()
+      await router.push({path: '/'})
     }
 
-    console.log(this.errors)
-  },
-  computed: {
-    ...mapState([
-      'user',
-      'errors'
-    ]),
-    isGeneralPages(): boolean {
-      return ['/auth', '/registration'].includes(this.$route.path)
-    },
-  },
-  methods: {
-    ...mapActions(['getUserInfo', 'logoutRequest']),
-
-    logout() {
-      this.logoutRequest()
-      this.$router.push({path: '/'})
-    }
+    return {user, userInfoLoader, isGeneralPages, logout}
   }
-});
+})
 </script>
 
 <style lang="less">

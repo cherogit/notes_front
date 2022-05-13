@@ -34,6 +34,10 @@ import {mapState, mapActions} from 'vuex'
 
 export default defineComponent({
   name: 'CreateNote',
+  setup() {
+
+    return {}
+  },
   data() {
     return {
       title: '',
