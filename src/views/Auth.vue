@@ -21,15 +21,15 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, nextTick, onMounted, Ref, ref} from 'vue'
+import {computed, defineComponent, ref} from 'vue'
 import {useStore} from '@/store'
 import {useApiWrapper} from '@/util/hooks'
 import {useRouter} from 'vue-router'
 
 const useAuth = (loginForm: { login: string, password: string }) => {
   const main = useStore()
-  const cb = (loginForm: Parameters<typeof main.authRequest>[0]) => main.authRequest(loginForm)
-  const authorization = useApiWrapper(cb)
+  const doLogin = (loginForm: Parameters<typeof main.authRequest>[0]) => main.authRequest(loginForm)
+  const authorization = useApiWrapper(doLogin)
 
   return {
     authorization
