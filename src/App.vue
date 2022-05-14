@@ -17,8 +17,20 @@
           <span class="header__user-info">{{ user.userName }}</span>
           <button class="btn btn--colored" type="button" @click="logout">logout</button>
         </template>
-        <button @click="toggleDark()">
-          Is Dark: {{ isDark }}
+        <button
+          class="btn btn--color-scheme"
+          @click="toggleDark()"
+        >
+          <img
+            v-if="isDark"
+            src="@/assets/icons/sun.svg"
+            alt="sun"
+          />
+          <img
+            v-else
+            src="@/assets/icons/mounth.svg"
+            alt="mounth"
+          />
         </button>
       </div>
     </div>
@@ -77,15 +89,19 @@ export default defineComponent({
   margin-bottom: 50px;
   background: rgba(40, 40, 40, 1);
   color: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 6px 1px #282828;
+  box-shadow: 0 0 6px 1px #1a1a1a;
+  transition: box-shadow 0.2s;
+
+  .dark & {
+    box-shadow: 0 0 6px 1px rgba(255,255,255, 0.87);
+  }
 }
 
 .header__wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 16px 0;
 }
 
 .nav__link {
