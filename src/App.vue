@@ -17,7 +17,9 @@
           <span class="header__user-info">{{ user.userName }}</span>
           <button class="btn btn--colored" type="button" @click="logout">logout</button>
         </template>
-        <router-link v-else class="btn btn--colored" to="/auth">authorization</router-link>
+        <button @click="toggleDark()">
+          Is Dark: {{ isDark }}
+        </button>
       </div>
     </div>
   </header>
@@ -37,6 +39,7 @@
 
 <script lang="ts">
 import {computed, defineComponent} from 'vue'
+import {useDark, useToggle} from '@vueuse/core'
 import {useStore} from '@/store/'
 import {useApiWrapper} from '@/util/hooks'
 import {useRoute, useRouter} from 'vue-router'
@@ -45,6 +48,10 @@ import {useUser} from '@/util/useUser'
 export default defineComponent({
   name: 'App',
   setup() {
+    const isDark = useDark({
+      selector: 'body',
+    })
+    const toggleDark = useToggle(isDark)
     const main = useStore()
     const route = useRoute()
     const router = useRouter()
@@ -59,7 +66,7 @@ export default defineComponent({
       await router.push({path: '/'})
     }
 
-    return {user, userInfoLoader, isGeneralPages, logout}
+    return {isDark, toggleDark, user, userInfoLoader, isGeneralPages, logout}
   }
 })
 </script>
