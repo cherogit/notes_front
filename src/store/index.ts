@@ -24,7 +24,7 @@ const randomFallAsync = async (str: string, ms: number) => {
   }
 }
 
-export const useStore = defineStore('main', {
+export const useUserStore = defineStore('main', {
   state: (): State => ({
     user: null,
     users: [],
