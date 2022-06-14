@@ -14,6 +14,7 @@
     "pinia": "^2.0.11",
     "vue": "^3.0.0",
     "vue-async-methods": "^0.9.1",
+    "vue-loader": "^17.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
   },
@@ -27,6 +28,6 @@
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
     "typescript": "~4.6.2",
-    "vue-cli-plugin-svg": "~0.2.1"
+    "vue-svg-loader": "^0.17.0-beta.2"
   }
 }

@@ -54,7 +54,8 @@ export const loadNoteById = async (noteId: string): Promise<Note> => {
   return (await api.get(`/note/${noteId}`)).data
 }
 
-export const createNote = async (noteCreationFormData: { title: string, note: string, labels: string, publication_date: string }): Promise<CreatableNote> => {
+export const createNote = async (noteCreationFormData: { title: string, note: string, labels: string, publication_date: string }): Promise<Note> => {
+  console.log(1, noteCreationFormData.title)
   return (await api.post('/create-note', noteCreationFormData)).data
 }
 

@@ -24,7 +24,7 @@ const randomFallAsync = async (str: string, ms: number) => {
   }
 }
 
-export const useUserStore = defineStore('main', {
+export const useStore = defineStore('main', {
   state: (): State => ({
     user: null,
     users: [],
@@ -71,5 +71,36 @@ export const useUserStore = defineStore('main', {
 
       this.setUser(null)
     },
+    async getNotes() {
+      const res = await api.getNotes()
+      this.setNotes(res.notes)
+    },
+    setNotes(payload: Note[]) {
+      this.notes = payload
+    },
+    async createNoteRequest(noteCreationFormData: any) {
+      console.log(noteCreationFormData)
+      const res = await api.createNote(noteCreationFormData)
+      console.log('createNoteRequest', res)
+      this.appendNote(res)
+    },
+    appendNote(note: Note) {
+      const existingNoteIndex = this.notes.findIndex(item => item._id === note._id)
+      if (existingNoteIndex >= 0) {
+        this.notes[existingNoteIndex] = note
+      } else {
+        this.notes.push(note)
+      }
+    },
+    async deleteNote(noteId: string) {
+      await api.deleteNote(noteId)
+      this.removeNote(noteId)
+    },
+    removeNote(payload: Note['_id']) {
+      const existingNoteIndex = this.notes.findIndex(item => item._id === payload)
+      if (existingNoteIndex != -1) {
+        this.notes.splice(existingNoteIndex, 1)
+      }
+    }
   }
 })

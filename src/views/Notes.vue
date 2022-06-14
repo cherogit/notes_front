@@ -3,23 +3,23 @@
     <h1>notes list</h1>
     <div class="notes__links">
       <router-link to="/create-note" class="btn btn--colored">add note</router-link>
-      <button class="btn btn--colored" type="button" @click="generateNote">generate note</button>
+      <button class="btn btn--colored" type="button" @click="generateNoteInfoLoader.run">generate note</button>
     </div>
 
     <div
-        v-if="isShowingPopup"
-        class="popup"
+      v-if="isShowingPopup"
+      class="popup"
     >
       <h3
-          v-if="titleOfTheNoteToBeDeleted"
-          class="popup__title"
+        v-if="titleOfTheNoteToBeDeleted"
+        class="popup__title"
       >
         Вы точно хотите удалить заметку {{ titleOfTheNoteToBeDeleted }}?
       </h3>
 
       <h5
-          v-if="deletionState !== DeletionStates.IDLE"
-          class="popup__status"
+        v-if="deletionState !== DeletionStates.IDLE"
+        class="popup__status"
       >
         <template v-if="deletionState === DeletionStates.PREPARING">
           Подождите...
@@ -31,66 +31,66 @@
           Успешно удалено
         </template>
       </h5>
-      <h5
-          v-if="errors.deleteNote"
-          class="popup__error"
-      >
-        Произошла ошибка <strong>{{ errors.deleteNote.message }}</strong> при удалении заметки
-        <strong>{{ titleOfTheNoteToBeDeleted }}</strong>: попробуйте повторить операцию
-      </h5>
+      <!--      <h5-->
+      <!--        v-if="errors.deleteNote"-->
+      <!--        class="popup__error"-->
+      <!--      >-->
+      <!--        Произошла ошибка <strong>{{ errors.deleteNote.message }}</strong> при удалении заметки-->
+      <!--        <strong>{{ titleOfTheNoteToBeDeleted }}</strong>: попробуйте повторить операцию-->
+      <!--      </h5>-->
 
       <div
-          v-if="deletionState !== DeletionStates.DONE"
-          class="popup__btns"
+        v-if="deletionState !== DeletionStates.DONE"
+        class="popup__btns"
       >
         <button
-            class="btn btn--success"
-            type="button"
-            :disabled="deletionState !== DeletionStates.IDLE"
-            @click="resetDeletion"
+          class="btn btn--success"
+          type="button"
+          :disabled="deletionState !== DeletionStates.IDLE"
+          @click="resetDeletion"
         >
           Отменить
         </button>
         <button
-            class="btn btn--warn"
-            type="button"
-            :disabled="deletionState !== DeletionStates.IDLE"
-            @click="requestDeleteNote"
+          class="btn btn--warn"
+          type="button"
+          :disabled="deletionState !== DeletionStates.IDLE"
+          @click="requestDeleteNote"
         >
-          <template v-if="errors.deleteNote">Повторить</template>
-          <template v-else>Да, хочу удалить</template>
+          <!--          <template v-if="errors.deleteNote">Повторить</template>-->
+          <template>Да, хочу удалить</template>
         </button>
       </div>
     </div>
 
     <ul class="notes__list">
       <li
-          v-for="(note, ndx) of notes"
-          :key="ndx"
-          class="notes__item"
+        v-for="(note, ndx) of notes"
+        :key="ndx"
+        class="notes__item"
       >
         <div class="notes__item-title">{{ note.title }}</div>
         <div class="notes__item-controls">
           <router-link
-              :to="{path: `/note/${note._id}/`}"
-              class="btn notes__item-controls-btn _more"
+            :to="{path: `/note/${note._id}/`}"
+            class="btn notes__item-controls-btn _more"
           >
             more
           </router-link>
           <button
-              class="btn notes__item-controls-btn _delete"
-              type="button"
-              @click="openNoteConfirmation(note._id)"
+            class="btn notes__item-controls-btn _delete"
+            type="button"
+            @click="openNoteConfirmation(note._id)"
           >
             delete
           </button>
-          <router-link
-              v-if="checkPermission(PERMISSIONS.updateNote)"
-              :to="{path: `/update/${note._id}/`}"
-              class="btn notes__item-controls-btn _update"
-          >
-            update
-          </router-link>
+          <!--          <router-link-->
+          <!--              v-if="checkPermission(PERMISSIONS.updateNote)"-->
+          <!--              :to="{path: `/update/${note._id}/`}"-->
+          <!--              class="btn notes__item-controls-btn _update"-->
+          <!--          >-->
+          <!--            update-->
+          <!--          </router-link>-->
         </div>
       </li>
     </ul>
@@ -98,116 +98,93 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from 'vue'
-import {mapActions, mapGetters, mapState} from 'vuex'
+import {computed, defineComponent, onMounted, ref} from 'vue'
 import {DeletionStates, PERMISSIONS} from '@/constants'
 import {Note} from '@/typings'
 import {useStore} from '@/store'
 import {storeToRefs} from 'pinia'
 import {useUser} from '@/util/useUser'
+import {useApiWrapper} from '@/util/hooks'
+import {useGenerateNote} from '@/util/useGenerateNote'
 
 export default defineComponent({
   name: 'Notes',
   setup() {
     const main = useStore()
     const {notes} = storeToRefs(main)
-    const isShowingPopup = ref(false)
+    let isShowingPopup = ref(false)
+    let removableNoteId = ref<string>('')
     const deletionState = ref(DeletionStates.IDLE)
-    const removableNoteId = ref('')
     const {user, userInfoLoader} = useUser({checkOnMount: true})
+    const {generateNoteInfoLoader} = useGenerateNote()
+
+    const notesInfoLoader = useApiWrapper(main.getNotes)
+
+    onMounted(async () => {
+      if (!(Array.isArray(notes) && notes.value.length)) {
+        await notesInfoLoader.run()
+      }
+    })
+
+    const titleOfTheNoteToBeDeleted = computed<string | null>(() => {
+      if (removableNoteId) {
+        return notes.value.find((note: Note) => note._id === removableNoteId.value)?.title || null
+      }
+
+      return null
+    })
+
+    const openNoteConfirmation = (noteId: string) => {
+      isShowingPopup.value = true
+      removableNoteId.value = noteId
+    }
+
+    const resetDeletion = () => {
+      isShowingPopup.value = false
+      removableNoteId.value = ''
+      deletionState.value = DeletionStates.IDLE
+    }
+
+    const requestDeleteNote = () => {
+      deletionState.value = DeletionStates.PREPARING
+
+      setTimeout(() => {
+        useApiWrapper(() => main.deleteNote(removableNoteId.value)).run()
+          // .then(() => {
+          //   this.$nextTick(() => {
+          //     if (this.errors.deleteNote) {
+          //       deletionState.value = DeletionStates.IDLE
+          //
+          //       return
+          //     } else {
+          //       deletionState.value = DeletionStates.DELETING
+          //
+          //       setTimeout(() => {
+          //         deletionState.value = DeletionStates.DONE
+          //
+          //         setTimeout(resetDeletion, 1000)
+          //       }, 1000)
+          //     }
+          //   })
+          // })
+      }, 1000)
+    }
 
     return {
       user,
       userInfoLoader,
-    }
-  },
-  data() {
-    return {
-      isShowingPopup: false,
-      deletionState: DeletionStates.IDLE,
-      removableNoteId: null as string | null,
-
+      notes,
+      isShowingPopup,
       DeletionStates,
-      PERMISSIONS
-    }
-  },
-  mounted() {
-    if (!this.user) {
-      this.getUserInfo()
-    }
+      deletionState,
+      removableNoteId,
+      titleOfTheNoteToBeDeleted,
+      PERMISSIONS,
 
-    if (!(Array.isArray(this.notes) && this.notes.length > 0)) {
-      this.getNotes()
-    }
-  },
-  computed: {
-    ...mapState(['user', 'errors', 'notes']),
-    ...mapGetters(['checkPermission']),
-
-    titleOfTheNoteToBeDeleted(): string | null {
-      if (this.removableNoteId) {
-        return this.notes.find((note: Note) => note._id === this.removableNoteId)?.title || null
-      }
-
-      return null
-    }
-  },
-  methods: {
-    ...mapActions(['getUserInfo', 'getNotes', 'createNoteRequest', 'deleteNote']),
-
-    generateNote() {
-      const randomTitleAndNoteStr: string = Math.random().toString().slice(2)
-      const labels = ['Новости', 'Рубрика', 'Новинка', 'Флуд']
-      const randomLabels = labels[Math.floor(Math.random() * labels.length)]
-      const date = new Date()
-      const publicationDate = date.toISOString().slice(0, 10)
-      const formData = new FormData()
-
-      formData.append('title', `${randomTitleAndNoteStr}_title`)
-      formData.append('note', `${randomTitleAndNoteStr}_note`)
-      formData.append('labels[]', randomLabels)
-      formData.append('publication_date', publicationDate)
-
-      this.createNoteRequest(formData).then(() => {
-        this.$nextTick(() => {
-          if (!this.errors.createNote) {
-            this.$router.push({path: '/notes'})
-          }
-        })
-      })
-    },
-    resetDeletion() {
-      this.isShowingPopup = false
-      this.removableNoteId = null
-      this.deletionState = DeletionStates.IDLE
-    },
-    openNoteConfirmation(noteId: string) {
-      this.isShowingPopup = true
-      this.removableNoteId = noteId
-    },
-    requestDeleteNote() {
-      this.deletionState = DeletionStates.PREPARING
-
-      setTimeout(() => {
-        this.deleteNote(this.removableNoteId)
-            .then(() => {
-              this.$nextTick(() => {
-                if (this.errors.deleteNote) {
-                  this.deletionState = DeletionStates.IDLE
-
-                  return
-                } else {
-                  this.deletionState = DeletionStates.DELETING
-
-                  setTimeout(() => {
-                    this.deletionState = DeletionStates.DONE
-
-                    setTimeout(this.resetDeletion, 1000)
-                  }, 1000)
-                }
-              })
-            })
-      }, 1000)
+      generateNoteInfoLoader,
+      resetDeletion,
+      openNoteConfirmation,
+      requestDeleteNote,
     }
   }
 })

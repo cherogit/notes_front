@@ -13,25 +13,17 @@
         </template>
       </nav>
       <div class="header__user">
-        <template v-if="user">
-          <span class="header__user-info">{{ user.userName }}</span>
-          <button class="btn btn--colored" type="button" @click="logout">logout</button>
-        </template>
         <button
           class="btn btn--color-scheme"
           @click="toggleDark()"
         >
-          <img
-            v-if="isDark"
-            src="@/assets/icons/sun.svg"
-            alt="sun"
-          />
-          <img
-            v-else
-            src="@/assets/icons/mounth.svg"
-            alt="mounth"
-          />
+          <sun-icon v-if="isDark"></sun-icon>
+          <mounth-icon v-else></mounth-icon>
         </button>
+        <template v-if="user">
+          <span class="header__user-info">{{ user.userName }}</span>
+          <button class="btn btn--colored" type="button" @click="logout">logout</button>
+        </template>
       </div>
     </div>
   </header>
@@ -56,14 +48,18 @@ import {useStore} from '@/store/'
 import {useApiWrapper} from '@/util/hooks'
 import {useRoute, useRouter} from 'vue-router'
 import {useUser} from '@/util/useUser'
+import SunIcon from '@/assets/icons/sun.svg'
+import MounthIcon from '@/assets/icons/mounth.svg'
 
 export default defineComponent({
   name: 'App',
+  components: {SunIcon, MounthIcon},
   setup() {
     const isDark = useDark({
       selector: 'body',
     })
     const toggleDark = useToggle(isDark)
+
     const main = useStore()
     const route = useRoute()
     const router = useRouter()
@@ -87,14 +83,20 @@ export default defineComponent({
 
 .header {
   margin-bottom: 50px;
-  background: rgba(40, 40, 40, 1);
+  background: #1a1a1a;
   color: rgba(255, 255, 255, 0.8);
   box-shadow: 0 0 6px 1px #1a1a1a;
   transition: box-shadow 0.2s;
 
   .dark & {
-    box-shadow: 0 0 6px 1px rgba(255,255,255, 0.87);
+    //box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.27);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.27);
   }
+}
+
+.header__user {
+  display: flex;
+  align-items: center;
 }
 
 .header__wrapper {
