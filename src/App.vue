@@ -32,8 +32,10 @@
     <div v-if="!!user || isGeneralPages">
       <router-view/>
     </div>
-    <div v-else-if="!user && (userInfoLoader.isRejected || userInfoLoader.isResolved)">
-      <h2>{{ userInfoLoader.error?.status }} {{ userInfoLoader.error?.message }}</h2>
+    <div v-else-if="!user">
+      <h2 v-if="userInfoLoader.isRejected">
+        {{ userInfoLoader.error?.status }} {{ userInfoLoader.error?.message }}
+      </h2>
       <br>
 
       <router-link class="btn btn--colored" to="/auth">authorization</router-link>

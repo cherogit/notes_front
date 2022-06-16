@@ -31,13 +31,14 @@
           Успешно удалено
         </template>
       </h5>
-      <!--      <h5-->
-      <!--        v-if="errors.deleteNote"-->
-      <!--        class="popup__error"-->
-      <!--      >-->
-      <!--        Произошла ошибка <strong>{{ errors.deleteNote.message }}</strong> при удалении заметки-->
-      <!--        <strong>{{ titleOfTheNoteToBeDeleted }}</strong>: попробуйте повторить операцию-->
-      <!--      </h5>-->
+      <h5
+        v-if="deleteNoteInfoLoader.isRejected && deleteNoteInfoLoader.error"
+        class="popup__error"
+      >
+        Произошла ошибка <strong>{{ deleteNoteInfoLoader.error.message }}</strong> <br>
+        при удалении заметки
+        <strong>{{ titleOfTheNoteToBeDeleted }}</strong>: <br>попробуйте повторить операцию
+      </h5>
 
       <div
         v-if="deletionState !== DeletionStates.DONE"
@@ -57,8 +58,8 @@
           :disabled="deletionState !== DeletionStates.IDLE"
           @click="requestDeleteNote"
         >
-          <!--          <template v-if="errors.deleteNote">Повторить</template>-->
-          <template>Да, хочу удалить</template>
+          <template v-if="deleteNoteInfoLoader.isRejected && deleteNoteInfoLoader.error">Повторить</template>
+          <template v-else>Да, хочу удалить</template>
         </button>
       </div>
     </div>
@@ -98,7 +99,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, ref} from 'vue'
+import {computed, defineComponent, nextTick, onMounted, ref} from 'vue'
 import {DeletionStates, PERMISSIONS} from '@/constants'
 import {Note} from '@/typings'
 import {useStore} from '@/store'
@@ -145,28 +146,28 @@ export default defineComponent({
       deletionState.value = DeletionStates.IDLE
     }
 
+    const deleteNoteInfoLoader = useApiWrapper(() => main.deleteNote(removableNoteId.value))
     const requestDeleteNote = () => {
       deletionState.value = DeletionStates.PREPARING
 
       setTimeout(() => {
-        useApiWrapper(() => main.deleteNote(removableNoteId.value)).run()
-          // .then(() => {
-          //   this.$nextTick(() => {
-          //     if (this.errors.deleteNote) {
-          //       deletionState.value = DeletionStates.IDLE
-          //
-          //       return
-          //     } else {
-          //       deletionState.value = DeletionStates.DELETING
-          //
-          //       setTimeout(() => {
-          //         deletionState.value = DeletionStates.DONE
-          //
-          //         setTimeout(resetDeletion, 1000)
-          //       }, 1000)
-          //     }
-          //   })
-          // })
+        deleteNoteInfoLoader
+          .run()
+          .then(() => {
+            nextTick(() => {
+              if (deleteNoteInfoLoader.error) {
+                deletionState.value = DeletionStates.IDLE
+                return
+              } else {
+                deletionState.value = DeletionStates.DELETING
+
+                setTimeout(() => {
+                  deletionState.value = DeletionStates.DONE
+                  setTimeout(resetDeletion, 1000)
+                }, 1000)
+              }
+            })
+          })
       }, 1000)
     }
 
@@ -185,6 +186,7 @@ export default defineComponent({
       resetDeletion,
       openNoteConfirmation,
       requestDeleteNote,
+      deleteNoteInfoLoader
     }
   }
 })

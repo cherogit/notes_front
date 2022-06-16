@@ -1,7 +1,8 @@
 import {defineStore} from 'pinia'
-import {Note, User, UserWithRoles} from '@/typings'
+import {CreatableNote, Note, User, UserWithRoles} from '@/typings'
 import * as api from '@/plugins/api'
 import {delay} from "@/util"
+import CreateNote from '@/views/CreateNote.vue'
 
 type ActionError = Error | null | { [K: string]: any }
 
@@ -78,10 +79,8 @@ export const useStore = defineStore('main', {
     setNotes(payload: Note[]) {
       this.notes = payload
     },
-    async createNoteRequest(noteCreationFormData: any) {
-      console.log(noteCreationFormData)
+    async createNoteRequest(noteCreationFormData: CreatableNote) {
       const res = await api.createNote(noteCreationFormData)
-      console.log('createNoteRequest', res)
       this.appendNote(res)
     },
     appendNote(note: Note) {

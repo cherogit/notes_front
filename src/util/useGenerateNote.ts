@@ -17,6 +17,8 @@ export const useGenerateNote = () => {
     formData.append('labels[]', randomLabels)
     formData.append('publication_date', publicationDate)
 
+    // TODO
+    // @ts-ignore
     return main.createNoteRequest(formData)
   })
 
