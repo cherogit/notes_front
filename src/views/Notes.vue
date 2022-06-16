@@ -141,6 +141,7 @@ export default defineComponent({
     }
 
     const resetDeletion = () => {
+      console.log(1)
       isShowingPopup.value = false
       removableNoteId.value = ''
       deletionState.value = DeletionStates.IDLE

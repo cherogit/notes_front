@@ -26,6 +26,7 @@ export const useAsyncWrapper = <T extends AbstractFunction, E extends Error>(pay
     try {
       state.result = await payloadGetter(...params)
       state.isResolved = true
+      state.error = null
     } catch (err) {
       console.log(err)
       state.isRejected = true
