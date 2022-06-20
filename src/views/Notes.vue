@@ -117,7 +117,7 @@ export default defineComponent({
     let removableNoteId = ref<string>('')
     const deletionState = ref(DeletionStates.IDLE)
     const {user, userInfoLoader} = useUser({checkOnMount: true})
-    const {generateNoteInfoLoader} = useGenerateNote()
+    const generateNoteInfoLoader = useApiWrapper(main.generateNote)
 
     const notesInfoLoader = useApiWrapper(main.getNotes)
 

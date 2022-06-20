@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {ApiError, CreatableNote, Note, User, UserWithRoles} from '@/typings'
+import {useGenerateNote} from '@/util/useGenerateNote'
 
 export const api = axios.create({
   baseURL: 'http://localhost:8000',
@@ -52,6 +53,12 @@ export const getNotes = async (): Promise<{ notes: Note[] }> => {
 
 export const loadNoteById = async (noteId: string): Promise<Note> => {
   return (await api.get(`/note/${noteId}`)).data
+}
+
+export const generateNote = async (): Promise<Note> => {
+  const noteFormData = useGenerateNote()
+
+  return (await api.post('/create-note', noteFormData)).data
 }
 
 export const createNote = async (noteCreationFormData: CreatableNote): Promise<Note> => {
