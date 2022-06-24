@@ -39,8 +39,8 @@ export const useStore = defineStore('main', {
 
       return false
     },
-    noteById: (state) => (_id: string): Note | null => {
-      return state.notes.find(note => note._id === _id) || null
+    getNoteById: (state) => {
+      return (_id: string): Note | null => state.notes.find(note => note._id === _id) || null
     }
   },
   actions: {
@@ -103,6 +103,9 @@ export const useStore = defineStore('main', {
       if (existingNoteIndex != -1) {
         this.notes.splice(existingNoteIndex, 1)
       }
+    },
+    async loadNoteById(noteId: string) {
+      return await api.loadNoteById(noteId)
     }
   }
 })

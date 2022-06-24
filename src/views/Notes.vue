@@ -106,7 +106,6 @@ import {useStore} from '@/store'
 import {storeToRefs} from 'pinia'
 import {useUser} from '@/util/useUser'
 import {useApiWrapper} from '@/util/hooks'
-import {useGenerateNote} from '@/util/useGenerateNote'
 
 export default defineComponent({
   name: 'Notes',
