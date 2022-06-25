@@ -106,25 +106,18 @@ import {useStore} from '@/store'
 import {storeToRefs} from 'pinia'
 import {useUser} from '@/util/useUser'
 import {useApiWrapper} from '@/util/hooks'
+import {useGetNotes} from '@/util/useGetNotes'
 
 export default defineComponent({
   name: 'Notes',
   setup() {
     const main = useStore()
-    const {notes} = storeToRefs(main)
     let isShowingPopup = ref(false)
     let removableNoteId = ref<string>('')
     const deletionState = ref(DeletionStates.IDLE)
     const {user, userInfoLoader} = useUser({checkOnMount: true})
     const generateNoteInfoLoader = useApiWrapper(main.generateNote)
-
-    const notesInfoLoader = useApiWrapper(main.getNotes)
-
-    onMounted(async () => {
-      if (!(Array.isArray(notes) && notes.value.length)) {
-        await notesInfoLoader.run()
-      }
-    })
+    const {notes} = useGetNotes()
 
     const titleOfTheNoteToBeDeleted = computed<string | null>(() => {
       if (removableNoteId) {
@@ -140,7 +133,6 @@ export default defineComponent({
     }
 
     const resetDeletion = () => {
-      console.log(1)
       isShowingPopup.value = false
       removableNoteId.value = ''
       deletionState.value = DeletionStates.IDLE

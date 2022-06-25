@@ -15,11 +15,11 @@ export interface UserWithRoles extends User {
 }
 
 export interface Note {
-  _id: string
-  title: string
-  note: string
+  _id: string | null
+  title: string | null
+  note: string | null
   labels: string[]
-  publication_date: string
+  publication_date: string | null
 }
 
 export type CreatableNote = Omit<Note, '_id'>

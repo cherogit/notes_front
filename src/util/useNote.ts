@@ -2,15 +2,23 @@ import {useStore} from '@/store'
 import {useApiWrapper} from '@/util/hooks'
 import {computed, onMounted, reactive, ref} from 'vue'
 import {useRoute} from 'vue-router'
+import {Note} from '@/typings'
 
 export const useNote = () => {
   const main = useStore()
-  let noteData = reactive({
-    _id: null as string | null,
-    title: null as string | null,
-    note: null as string | null,
-    labels: [] as string[],
-    publicationDate: null as string | null,
+  // let noteData = ref({
+  //   _id: null as string | null,
+  //   title: null as string | null,
+  //   note: null as string | null,
+  //   labels: [] as string[],
+  //   publicationDate: null as string | null,
+  // })
+  let noteData = ref<Note | null>({
+    _id: '',
+    title: '',
+    note: '',
+    labels: [],
+    publication_date: '',
   })
   const getNoteById = main.getNoteById
   const route = useRoute()
@@ -32,15 +40,17 @@ export const useNote = () => {
       return
     }
 
-    let note = getNoteById(_id.value)
+    noteData = getNoteById(_id.value)
 
-    if (!note) {
+    if (!noteData) {
       await noteInfoLoader.run()
-      note = getNoteById(_id.value)
+      noteData = getNoteById(_id.value)
+
+      console.log(1, noteData)
     }
 
     // @ts-ignore
-    noteData = note
+    // noteData = note
 
     console.log('noteData', note, noteData)
   })

@@ -8,8 +8,7 @@ type ActionError = Error | null | { [K: string]: any }
 interface State {
   user: User | null,
   users: UserWithRoles[],
-  notes: Note[],
-  errors: Record<string, ActionError>
+  notes: Note[]
 }
 
 const randomFallAsync = async (str: string, ms: number) => {
@@ -28,8 +27,7 @@ export const useStore = defineStore('main', {
   state: (): State => ({
     user: null,
     users: [],
-    notes: [],
-    errors: {}
+    notes: []
   }),
   getters: {
     checkPermission: (state) => (permission: string): boolean => {
@@ -39,18 +37,16 @@ export const useStore = defineStore('main', {
 
       return false
     },
-    getNoteById: (state) => {
-      return (_id: string): Note | null => state.notes.find(note => note._id === _id) || null
-    }
+    getNoteById: (state) => (_id: string) => state.notes.find((note) => note._id === _id) || null
   },
   actions: {
-    setError(value: { action: keyof State['errors'], error: Error | null }) {
-      if ((value.error as any)?.response) {
-        this.errors[value.action] = (value.error as any).response.data || null
-      } else {
-        this.errors[value.action] = value.error
-      }
-    },
+    // setError(value: { action: keyof State['errors'], error: Error | null }) {
+    //   if ((value.error as any)?.response) {
+    //     this.errors[value.action] = (value.error as any).response.data || null
+    //   } else {
+    //     this.errors[value.action] = value.error
+    //   }
+    // },
     randomFallAction: async (str: string) => {
       return await randomFallAsync(str, 1000)
     },
