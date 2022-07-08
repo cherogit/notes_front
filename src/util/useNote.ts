@@ -40,19 +40,12 @@ export const useNote = () => {
       return
     }
 
-    noteData = getNoteById(_id.value)
+    noteData.value = getNoteById(_id.value)
 
-    if (!noteData) {
+    if (!noteData.value) {
       await noteInfoLoader.run()
-      noteData = getNoteById(_id.value)
-
-      console.log(1, noteData)
+      noteData.value = getNoteById(_id.value)
     }
-
-    // @ts-ignore
-    // noteData = note
-
-    console.log('noteData', note, noteData)
   })
 
   return {

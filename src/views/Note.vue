@@ -1,12 +1,11 @@
 <template>
   <div class="note">
-    note {{ note }}
-<!--    <div class="note__title">{{ noteData.title }}</div>-->
-<!--    <div class="note__body">-->
-<!--      <div>{{ noteData.note }}</div>-->
-<!--      <div>{{ noteData.labels[0] }}</div>-->
-<!--      <div>{{ noteData.publication_date }}</div>-->
-<!--    </div>-->
+    <div class="note__title">{{ noteData.title }}</div>
+    <div class="note__body">
+      <div>{{ noteData.note }}</div>
+      <div>{{ noteData.labels[0] }}</div>
+      <div>{{ noteData.publication_date }}</div>
+    </div>
     <div class="note__controls">
 <!--      <button-->
 <!--        class="btn notes__item-controls-btn _delete"-->
@@ -15,12 +14,12 @@
 <!--      >-->
 <!--        delete-->
 <!--      </button>-->
-<!--      <router-link-->
-<!--        :to="{path: `/update/${noteData._id}/`}"-->
-<!--        class="btn note__controls-btn _update"-->
-<!--      >-->
-<!--        update-->
-<!--      </router-link>-->
+      <router-link
+        :to="{path: `/update/${noteData._id}/`}"
+        class="btn note__controls-btn _update"
+      >
+        update
+      </router-link>
     </div>
   </div>
 </template>
@@ -34,14 +33,12 @@ export default defineComponent({
   name: 'Note',
   setup() {
     useGetNotes()
-    const {note, noteInfoLoader} = useNote()
-
-    console.log(333, note)
+    const {noteData, noteInfoLoader} = useNote()
 
     return {
-      note,
+      noteData,
       noteInfoLoader,
     }
   }
-});
+})
 </script>
