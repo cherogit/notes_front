@@ -85,7 +85,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 form {
   display: block;
 }

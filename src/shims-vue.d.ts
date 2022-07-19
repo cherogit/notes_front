@@ -5,6 +5,11 @@ declare module '*.vue' {
   export default component
 }
 
+declare module "*.svg" {
+  const content: any
+  export default content
+}
+
 import {Store} from './store'
 
 declare module '@vue/runtime-core' {

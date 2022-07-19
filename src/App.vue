@@ -13,11 +13,17 @@
         </template>
       </nav>
       <div class="header__user">
+        <button
+          class="btn btn--color-scheme"
+          @click="toggleDark()"
+        >
+          <sun-icon v-if="isDark"></sun-icon>
+          <mounth-icon v-else></mounth-icon>
+        </button>
         <template v-if="user">
           <span class="header__user-info">{{ user.userName }}</span>
           <button class="btn btn--colored" type="button" @click="logout">logout</button>
         </template>
-        <router-link v-else class="btn btn--colored" to="/auth">authorization</router-link>
       </div>
     </div>
   </header>
@@ -26,8 +32,10 @@
     <div v-if="!!user || isGeneralPages">
       <router-view/>
     </div>
-    <div v-else-if="!user && (userInfoLoader.isRejected || userInfoLoader.isResolved)">
-      <h2>{{ userInfoLoader.error?.status }} {{ userInfoLoader.error?.message }}</h2>
+    <div v-else-if="!user">
+      <h2 v-if="userInfoLoader.isRejected">
+        {{ userInfoLoader.error?.status }} {{ userInfoLoader.error?.message }}
+      </h2>
       <br>
 
       <router-link class="btn btn--colored" to="/auth">authorization</router-link>
@@ -37,14 +45,23 @@
 
 <script lang="ts">
 import {computed, defineComponent} from 'vue'
+import {useDark, useToggle} from '@vueuse/core'
 import {useStore} from '@/store/'
 import {useApiWrapper} from '@/util/hooks'
 import {useRoute, useRouter} from 'vue-router'
 import {useUser} from '@/util/useUser'
+import SunIcon from '@/assets/icons/sun.svg'
+import MounthIcon from '@/assets/icons/mounth.svg'
 
 export default defineComponent({
   name: 'App',
+  components: {SunIcon, MounthIcon},
   setup() {
+    const isDark = useDark({
+      selector: 'body',
+    })
+    const toggleDark = useToggle(isDark)
+
     const main = useStore()
     const route = useRoute()
     const router = useRouter()
@@ -59,7 +76,7 @@ export default defineComponent({
       await router.push({path: '/'})
     }
 
-    return {user, userInfoLoader, isGeneralPages, logout}
+    return {isDark, toggleDark, user, userInfoLoader, isGeneralPages, logout}
   }
 })
 </script>
@@ -68,17 +85,27 @@ export default defineComponent({
 
 .header {
   margin-bottom: 50px;
-  background: rgba(40, 40, 40, 1);
+  background: #1a1a1a;
   color: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 6px 1px #282828;
+  box-shadow: 0 0 6px 1px #1a1a1a;
+  transition: box-shadow 0.2s;
+
+  .dark & {
+    //box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.27);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.27);
+  }
+}
+
+.header__user {
+  display: flex;
+  align-items: center;
 }
 
 .header__wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 16px 0;
 }
 
 .nav__link {
