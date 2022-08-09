@@ -26,55 +26,19 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue'
-import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
+import {useGetNotes} from '@/util/useGetNotes'
+import {useNote} from '@/util/useNote'
 
 export default defineComponent({
   name: 'Note',
-  data() {
+  setup() {
+    useGetNotes()
+    const {noteData, noteInfoLoader} = useNote()
+
     return {
-      noteData: {
-        _id: null as string | null,
-        title: null as string | null,
-        note: null as string | null,
-        labels: [] as string[],
-        publicationDate: null as string | null,
-      }
+      noteData,
+      noteInfoLoader,
     }
-  },
-  async mounted() {
-    const _id = this.idOfTheNote
-
-    if (!_id) {
-      return
-    }
-
-    this.setError({action: 'loadNoteById', error: null})
-
-    let note = this.noteById(_id)
-
-    if (!note) {
-      await this.loadNoteById(_id)
-      note = this.noteById(_id)
-    }
-
-    this.noteData = note
-  },
-  computed: {
-    ...mapState(['errors']),
-    ...mapGetters(['noteById']),
-    idOfTheNote(): string | null {
-      let id = this.$route.params?.id
-
-      if (Array.isArray(id)) {
-        id = id[0]
-      }
-
-      return id || null
-    },
-  },
-  methods: {
-    ...mapMutations(['setError']),
-    ...mapActions(['loadNoteById']),
-  },
-});
+  }
+})
 </script>
